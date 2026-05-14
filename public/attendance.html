@@ -1385,8 +1385,10 @@
       }
       const fromDate = document.getElementById('deleteFrom').value;
       const toDate = document.getElementById('deleteTo').value;
+      const include = document.getElementById('deleteInclude').value;
+      const includeText = include === 'all' ? '' : ` (${include} only)`;
       document.getElementById('confirmMessage').textContent =
-        `Are you sure you want to delete ${count} entries from ${fromDate} to ${toDate}? This action cannot be undone.`;
+        `Are you sure you want to delete ${count} entries from ${fromDate} to ${toDate}${includeText}? This action cannot be undone.`;
       document.getElementById('confirmModal').classList.add('active');
     }
 
