@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      color: #1f2937;
+    }
+
+    .mono {
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .logo svg {
+      width: 24px;
+      height: 24px;
+      color: #3b6ef8;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .nav-btn:hover {
+      color: #3b6ef8;
+    }
+
+    .nav-btn.active {
+      color: #3b6ef8;
+    }
+
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #3b6ef8;
+      border-radius: 2px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #16a34a;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .live-dot.disconnected {
+      background: #ef4444;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Main Content */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1f2937;
+    }
+
+    /* Form */
+    .entry-form {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .form-group.remarks {
+      flex: 2;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .form-label .required {
+      color: #ef4444;
+    }
+
+    .form-input, .form-select {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #3b6ef8;
+      box-shadow: 0 0 0 3px rgba(59, 110, 248, 0.1);
+    }
+
+    .form-input:disabled, .form-select:disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn {
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #3b6ef8;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2d5ae0;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-success {
+      background: #16a34a;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #e5e7eb;
+      color: #4b5563;
+    }
+
+    .btn-outline:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    /* Info Note */
+    .info-note {
+      display: none;
+      padding: 0.75rem 1rem;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      color: #1e40af;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .info-note.visible {
+      display: block;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6b7280;
+      background: #f9fafb;
+    }
+
+    td {
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    tr.overdue {
+      background: #fff1f1 !important;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+
+    .elapsed-green { color: #16a34a; }
+    .elapsed-amber { color: #d97706; }
+    .elapsed-red { color: #ef4444; }
+
+    /* Report Tab */
+    .month-group {
+      margin-bottom: 1rem;
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #f9fafb;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .group-header:hover {
+      background: #f3f4f6;
+    }
+
+    .group-header svg {
+      width: 20px;
+      height: 20px;
+      color: #6b7280;
+      transition: transform 0.2s;
+    }
+
+    .group-header.expanded svg {
+      transform: rotate(90deg);
+    }
+
+    .group-content {
+      display: none;
+      padding: 0.5rem 0 0.5rem 1.5rem;
+    }
+
+    .group-content.expanded {
+      display: block;
+    }
+
+    .day-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .day-header:hover {
+      border-color: #3b6ef8;
+    }
+
+    .day-header svg {
+      width: 16px;
+      height: 16px;
+      color: #6b7280;
+      transition: transform 0.2s;
+    }
+
+    .day-header.expanded svg {
+      transform: rotate(90deg);
+    }
+
+    .day-content {
+      display: none;
+      margin-top: 0.5rem;
+    }
+
+    .day-content.expanded {
+      display: block;
+    }
+
+    /* Admin Cards */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .admin-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .admin-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .admin-card textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 100px;
+      margin-bottom: 0.75rem;
+    }
+
+    .admin-card textarea:focus {
+      outline: none;
+      border-color: #3b6ef8;
+      box-shadow: 0 0 0 3px rgba(59, 110, 248, 0.1);
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .tag-remove {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .tag-remove:hover {
+      color: #ef4444;
+    }
+
+    .delete-filter {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .delete-count {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .export-form {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.2s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #1f2937;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toast {
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success { background: #166534; }
+    .toast.error { background: #991b1b; }
+    .toast.info { background: #1e40af; }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #9ca3af;
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .main {
+        padding: 1rem;
+      }
+
+      .entry-form {
+        flex-direction: column;
+      }
+
+      .form-group {
+        width: 100%;
+      }
+
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+        </svg>
+        Attendance Log
+      </div>
+      <div class="header-right">
+        <nav class="nav">
+          <button class="nav-btn active" data-tab="entry">New Entry</button>
+          <button class="nav-btn" data-tab="report">Report</button>
+          <button class="nav-btn" data-tab="admin">Admin</button>
+        </nav>
+        <div class="live-indicator">
+          <span class="live-dot" id="liveDot"></span>
+          <span id="liveText">Live</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- New Entry Tab -->
+    <div class="tab-content active" id="tab-entry">
+      <div class="card">
+        <h2 class="card-title">Log Attendance</h2>
+        <form class="entry-form" id="entryForm">
+          <div class="form-group">
+            <label class="form-label">Agent Name <span class="required">*</span></label>
+            <input type="text" class="form-input" id="agentName" list="agentsList" required autocomplete="off">
+            <datalist id="agentsList"></datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Team Lead <span class="required">*</span></label>
+            <select class="form-select" id="teamLead" required>
+              <option value="">Select Lead</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Work Status <span class="required">*</span></label>
+            <select class="form-select" id="workStatus" required>
+              <option value="">Select Status</option>
+              <option value="WIO">WIO</option>
+              <option value="WFH">WFH</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location <span class="required">*</span></label>
+            <select class="form-select" id="location" required>
+              <option value="">Select Location</option>
+              <option value="Cebu">Cebu</option>
+              <option value="Manila">Manila</option>
+            </select>
+          </div>
+          <div class="form-group remarks">
+            <label class="form-label">Remarks</label>
+            <input type="text" class="form-input" id="remarks">
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span>⏱</span> Log In
+          </button>
+        </form>
+        <div class="info-note" id="infoNote"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Today's Active Entries</h2>
+        <div class="table-container">
+          <table id="activeTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Team Lead</th>
+                <th>Log In</th>
+                <th>Log Out</th>
+                <th>Elapsed</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Remarks</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="activeTableBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="activeEmpty" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p>No active entries today</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Tab -->
+    <div class="tab-content" id="tab-report">
+      <div class="card">
+        <h2 class="card-title">Completed Entries</h2>
+        <div id="reportContent"></div>
+        <div class="empty-state" id="reportEmpty" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+          <p>No completed entries yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Tab -->
+    <div class="tab-content" id="tab-admin">
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3 class="card-title">Manage Agents</h3>
+          <textarea id="agentsBulk" placeholder="Enter agent names (one per line)"></textarea>
+          <button class="btn btn-primary" id="addAgentsBtn">Add Agents</button>
+          <div class="tags-list" id="agentsTags"></div>
+        </div>
+
+        <div class="admin-card">
+          <h3 class="card-title">Manage Team Leads</h3>
+          <textarea id="leadsBulk" placeholder="Enter team lead names (one per line)"></textarea>
+          <button class="btn btn-primary" id="addLeadsBtn">Add Team Leads</button>
+          <div class="tags-list" id="leadsTags"></div>
+        </div>
+
+        <div class="admin-card">
+          <h3 class="card-title">Delete Entries</h3>
+          <div class="delete-filter">
+            <select class="form-select" id="deleteFilter">
+              <option value="all">All Entries</option>
+              <option value="today">Today</option>
+              <option value="month">This Month</option>
+            </select>
+            <span class="delete-count" id="deleteCount">0 entries</span>
+          </div>
+          <button class="btn btn-danger" id="deleteEntriesBtn">Delete Entries</button>
+        </div>
+
+        <div class="admin-card full-width">
+          <h3 class="card-title">Export to Excel</h3>
+          <div class="export-form">
+            <div class="form-group">
+              <label class="form-label">From Date</label>
+              <input type="date" class="form-input" id="exportFrom">
+            </div>
+            <div class="form-group">
+              <label class="form-label">To Date</label>
+              <input type="date" class="form-input" id="exportTo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Include</label>
+              <select class="form-select" id="exportInclude">
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
+            <button class="btn btn-success" id="exportBtn">
+              <span>📥</span> Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Password Modal -->
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal">
+      <h3 class="modal-title">🔒 Password Required</h3>
+      <div class="form-group">
+        <label class="form-label">Enter Password</label>
+        <input type="password" class="form-input" id="passwordInput" placeholder="Enter password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="passwordCancel">Cancel</button>
+        <button class="btn btn-primary" id="passwordSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Modal -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal">
+      <h3 class="modal-title">🚪 Log Out <span id="logoutAgentName"></span></h3>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label">Employee ID <span class="required">*</span></label>
+        <input type="text" class="form-input" id="logoutEmpId" required placeholder="Enter Employee ID">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Remarks</label>
+        <input type="text" class="form-input" id="logoutRemarks" placeholder="Optional remarks">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="logoutCancel">Cancel</button>
+        <button class="btn btn-danger" id="logoutSubmit">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <h3 class="modal-title">⚠️ Confirm Delete</h3>
+      <p id="confirmMessage">Are you sure you want to delete these entries? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="confirmCancel">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      databaseURL: "https://atcp-attendance-dale-default-rtdb.firebaseio.com"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const dbRef = db.ref('atcp_attendance');
+
+    // State
+    let entries = {};
+    let agents = [];
+    let leads = [];
+    let isConnected = false;
+    let currentLogoutId = null;
+    let pendingTab = null;
+    let unlockedTabs = { report: false, admin: false };
+
+    const PASSWORD = 'Pineapple';
+
+    // DOM Elements
+    const liveDot = document.getElementById('liveDot');
+    const liveText = document.getElementById('liveText');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initFirebaseConnection();
+      initNavigation();
+      initEntryForm();
+      initAdminPanel();
+      initModals();
+      loadFromLocalStorage();
+      syncFromFirebase();
+
+      // Auto-refresh elapsed times
+      setInterval(updateElapsedTimes, 30000);
+
+      // Sync from Firebase every 15 seconds
+      setInterval(syncFromFirebase, 15000);
+
+      // Set default export dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('exportFrom').value = today;
+      document.getElementById('exportTo').value = today;
+    });
+
+    // Firebase Connection Status
+    function initFirebaseConnection() {
+      db.ref('.info/connected').on('value', (snapshot) => {
+        isConnected = snapshot.val() === true;
+        updateConnectionStatus();
+      });
+    }
+
+    function updateConnectionStatus() {
+      if (isConnected) {
+        liveDot.classList.remove('disconnected');
+        liveText.textContent = 'Live';
+      } else {
+        liveDot.classList.add('disconnected');
+        liveText.textContent = 'Offline';
+      }
+    }
+
+    // Navigation
+    function initNavigation() {
+      navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          if ((tab === 'report' || tab === 'admin') && !unlockedTabs[tab]) {
+            pendingTab = tab;
+            openPasswordModal();
+            return;
+          }
+          switchTab(tab);
+        });
+      });
+    }
+
+    function switchTab(tab) {
+      navBtns.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+
+      if (tab === 'report') renderReport();
+      if (tab === 'admin') updateDeleteCount();
+    }
+
+    // Entry Form
+    function initEntryForm() {
+      const form = document.getElementById('entryForm');
+      const agentInput = document.getElementById('agentName');
+      const submitBtn = document.getElementById('submitBtn');
+
+      agentInput.addEventListener('input', handleAgentInput);
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (submitBtn.classList.contains('btn-danger')) {
+          handleFormLogout();
+        } else {
+          handleLogIn();
+        }
+      });
+    }
+
+    function handleAgentInput() {
+      const agentName = document.getElementById('agentName').value.trim();
+      const teamLead = document.getElementById('teamLead');
+      const workStatus = document.getElementById('workStatus');
+      const location = document.getElementById('location');
+      const submitBtn = document.getElementById('submitBtn');
+      const infoNote = document.getElementById('infoNote');
+
+      // Find active entry for this agent
+      const activeEntry = Object.values(entries).find(
+        e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
+      );
+
+      if (activeEntry) {
+        // Auto-fill and lock fields
+        teamLead.value = activeEntry.lead;
+        workStatus.value = activeEntry.ws;
+        location.value = activeEntry.loc;
+
+        teamLead.disabled = true;
+        workStatus.disabled = true;
+        location.disabled = true;
+
+        const logInTime = formatTime(activeEntry.logIn);
+        infoNote.innerHTML = `<strong>${activeEntry.agent}</strong> is already clocked in since <span class="mono">${logInTime}</span> — fields auto-filled.`;
+        infoNote.classList.add('visible');
+
+        submitBtn.innerHTML = '<span>🚪</span> Log Out';
+        submitBtn.classList.remove('btn-primary');
+        submitBtn.classList.add('btn-danger');
+      } else {
+        // Unlock fields
+        teamLead.disabled = false;
+        workStatus.disabled = false;
+        location.disabled = false;
+
+        infoNote.classList.remove('visible');
+
+        submitBtn.innerHTML = '<span>⏱</span> Log In';
+        submitBtn.classList.remove('btn-danger');
+        submitBtn.classList.add('btn-primary');
+      }
+    }
+
+    function handleLogIn() {
+      const agentName = document.getElementById('agentName').value.trim();
+      const teamLead = document.getElementById('teamLead').value;
+      const workStatus = document.getElementById('workStatus').value;
+      const location = document.getElementById('location').value;
+      const remarks = document.getElementById('remarks').value.trim();
+
+      if (!agentName || !teamLead || !workStatus || !location) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+      }
+
+      const entry = {
+        id: generateId(),
+        agent: agentName,
+        lead: teamLead,
+        ws: workStatus,
+        loc: location,
+        remarks: remarks,
+        logIn: Date.now(),
+        logOut: null,
+        empId: null,
+        logOutRemarks: null
+      };
+
+      saveEntry(entry);
+      resetForm();
+      showToast(`⏱ ${agentName} clocked in!`, 'success');
+    }
+
+    function handleFormLogout() {
+      const agentName = document.getElementById('agentName').value.trim();
+      const remarks = document.getElementById('remarks').value.trim();
+
+      const activeEntry = Object.values(entries).find(
+        e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
+      );
+
+      if (activeEntry) {
+        activeEntry.logOut = Date.now();
+        activeEntry.logOutRemarks = remarks || null;
+        saveEntry(activeEntry);
+        resetForm();
+        showToast(`👋 ${agentName} clocked out at ${formatTime(activeEntry.logOut)}!`, 'success');
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('entryForm').reset();
+      document.getElementById('teamLead').disabled = false;
+      document.getElementById('workStatus').disabled = false;
+      document.getElementById('location').disabled = false;
+      document.getElementById('infoNote').classList.remove('visible');
+      document.getElementById('submitBtn').innerHTML = '<span>⏱</span> Log In';
+      document.getElementById('submitBtn').classList.remove('btn-danger');
+      document.getElementById('submitBtn').classList.add('btn-primary');
+    }
+
+    // Active Table
+    function renderActiveTable() {
+      const tbody = document.getElementById('activeTableBody');
+      const emptyState = document.getElementById('activeEmpty');
+
+      const today = new Date().toDateString();
+      const activeEntries = Object.values(entries).filter(e => {
+        const entryDate = new Date(e.logIn).toDateString();
+        return !e.logOut && entryDate === today;
+      }).sort((a, b) => b.logIn - a.logIn);
+
+      if (activeEntries.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      tbody.innerHTML = activeEntries.map(entry => {
+        const elapsed = getElapsedTime(entry.logIn);
+        const hours = elapsed.hours + (elapsed.days * 24);
+        const totalHours = hours + (elapsed.minutes / 60);
+        const isOverdue = totalHours > 22;
+
+        let elapsedClass = 'elapsed-green';
+        if (totalHours >= 8 && totalHours <= 22) elapsedClass = 'elapsed-amber';
+        if (totalHours > 22) elapsedClass = 'elapsed-red';
+
+        return `
+          <tr class="${isOverdue ? 'overdue' : ''}">
+            <td><strong>${entry.agent}</strong></td>
+            <td>${entry.lead}</td>
+            <td class="mono">${formatTime(entry.logIn)}</td>
+            <td>—</td>
+            <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
+            <td>
+              ${isOverdue ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}
+            </td>
+            <td>${entry.loc}</td>
+            <td>${entry.remarks || '—'}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="openLogoutModal('${entry.id}', '${entry.agent}')">
+                Log Out
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateElapsedTimes() {
+      renderActiveTable();
+    }
+
+    // Report Tab
+    function renderReport() {
+      const content = document.getElementById('reportContent');
+      const emptyState = document.getElementById('reportEmpty');
+
+      const completedEntries = Object.values(entries).filter(e => e.logOut);
+
+      if (completedEntries.length === 0) {
+        content.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      // Group by month and day
+      const grouped = {};
+      completedEntries.forEach(entry => {
+        const date = new Date(entry.logIn);
+        const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const dayKey = date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
+
+        if (!grouped[monthKey]) grouped[monthKey] = {};
+        if (!grouped[monthKey][dayKey]) grouped[monthKey][dayKey] = [];
+        grouped[monthKey][dayKey].push(entry);
+      });
+
+      let html = '';
+      Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(month => {
+        html += `
+          <div class="month-group">
+            <div class="group-header" onclick="toggleGroup(this)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+              ${month} (${Object.values(grouped[month]).flat().length} entries)
+            </div>
+            <div class="group-content">
+        `;
+
+        Object.keys(grouped[month]).forEach(day => {
+          const dayEntries = grouped[month][day].sort((a, b) => b.logIn - a.logIn);
+          html += `
+            <div class="day-group">
+              <div class="day-header" onclick="toggleGroup(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+                ${day} (${dayEntries.length} entries)
+              </div>
+              <div class="day-content">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Team Lead</th>
+                        <th>Log In</th>
+                        <th>Log Out</th>
+                        <th>Elapsed</th>
+                        <th>Work Status</th>
+                        <th>Location</th>
+                        <th>Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${dayEntries.map(entry => {
+                        const elapsed = getElapsedTime(entry.logIn, entry.logOut);
+                        const hours = elapsed.hours + (elapsed.days * 24);
+                        const totalHours = hours + (elapsed.minutes / 60);
+
+                        let elapsedClass = 'elapsed-green';
+                        if (totalHours >= 8 && totalHours <= 22) elapsedClass = 'elapsed-amber';
+                        if (totalHours > 22) elapsedClass = 'elapsed-red';
+
+                        return `
+                          <tr>
+                            <td><strong>${entry.agent}</strong></td>
+                            <td>${entry.lead}</td>
+                            <td class="mono">${formatTime(entry.logIn)}</td>
+                            <td class="mono">${formatTime(entry.logOut)}</td>
+                            <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
+                            <td>${entry.ws}</td>
+                            <td>${entry.loc}</td>
+                            <td>${entry.remarks || '—'}</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += '</div></div>';
+      });
+
+      content.innerHTML = html;
+    }
+
+    function toggleGroup(header) {
+      header.classList.toggle('expanded');
+      const content = header.nextElementSibling;
+      content.classList.toggle('expanded');
+    }
+
+    // Admin Panel
+    function initAdminPanel() {
+      document.getElementById('addAgentsBtn').addEventListener('click', addAgents);
+      document.getElementById('addLeadsBtn').addEventListener('click', addLeads);
+      document.getElementById('deleteFilter').addEventListener('change', updateDeleteCount);
+      document.getElementById('deleteEntriesBtn').addEventListener('click', confirmDeleteEntries);
+      document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+    }
+
+    function addAgents() {
+      const textarea = document.getElementById('agentsBulk');
+      const names = textarea.value.split('\n').map(n => n.trim()).filter(n => n);
+      if (names.length === 0) return;
+
+      const newAgents = [...new Set([...agents, ...names])];
+      agents = newAgents;
+      saveAgentsAndLeads();
+      textarea.value = '';
+      renderAgentsTags();
+      updateAgentsDatalist();
+      showToast(`Added ${names.length} agent(s)`, 'success');
+    }
+
+    function addLeads() {
+      const textarea = document.getElementById('leadsBulk');
+      const names = textarea.value.split('\n').map(n => n.trim()).filter(n => n);
+      if (names.length === 0) return;
+
+      const newLeads = [...new Set([...leads, ...names])];
+      leads = newLeads;
+      saveAgentsAndLeads();
+      textarea.value = '';
+      renderLeadsTags();
+      updateLeadsDropdown();
+      showToast(`Added ${names.length} team lead(s)`, 'success');
+    }
+
+    function removeAgent(name) {
+      agents = agents.filter(a => a !== name);
+      saveAgentsAndLeads();
+      renderAgentsTags();
+      updateAgentsDatalist();
+    }
+
+    function removeLead(name) {
+      leads = leads.filter(l => l !== name);
+      saveAgentsAndLeads();
+      renderLeadsTags();
+      updateLeadsDropdown();
+    }
+
+    function renderAgentsTags() {
+      const container = document.getElementById('agentsTags');
+      container.innerHTML = agents.map(a => `
+        <span class="tag">
+          ${a}
+          <button class="tag-remove" onclick="removeAgent('${a}')">&times;</button>
+        </span>
+      `).join('');
+    }
+
+    function renderLeadsTags() {
+      const container = document.getElementById('leadsTags');
+      container.innerHTML = leads.map(l => `
+        <span class="tag">
+          ${l}
+          <button class="tag-remove" onclick="removeLead('${l}')">&times;</button>
+        </span>
+      `).join('');
+    }
+
+    function updateAgentsDatalist() {
+      const datalist = document.getElementById('agentsList');
+      datalist.innerHTML = agents.map(a => `<option value="${a}">`).join('');
+    }
+
+    function updateLeadsDropdown() {
+      const select = document.getElementById('teamLead');
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">Select Lead</option>' +
+        leads.map(l => `<option value="${l}">${l}</option>`).join('');
+      if (leads.includes(currentValue)) select.value = currentValue;
+    }
+
+    function updateDeleteCount() {
+      const filter = document.getElementById('deleteFilter').value;
+      const count = getFilteredEntries(filter).length;
+      document.getElementById('deleteCount').textContent = `${count} entries`;
+    }
+
+    function getFilteredEntries(filter) {
+      const now = new Date();
+      const today = now.toDateString();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+
+      return Object.values(entries).filter(e => {
+        if (filter === 'all') return true;
+        const entryDate = new Date(e.logIn);
+        if (filter === 'today') return entryDate.toDateString() === today;
+        if (filter === 'month') return entryDate.getMonth() === thisMonth && entryDate.getFullYear() === thisYear;
+        return true;
+      });
+    }
+
+    function confirmDeleteEntries() {
+      const filter = document.getElementById('deleteFilter').value;
+      const count = getFilteredEntries(filter).length;
+      if (count === 0) {
+        showToast('No entries to delete', 'info');
+        return;
+      }
+      document.getElementById('confirmMessage').textContent =
+        `Are you sure you want to delete ${count} entries? This action cannot be undone.`;
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function deleteEntries() {
+      const filter = document.getElementById('deleteFilter').value;
+      const toDelete = getFilteredEntries(filter);
+
+      toDelete.forEach(e => {
+        delete entries[e.id];
+        dbRef.child('entries').child(e.id).remove();
+      });
+
+      saveToLocalStorage();
+      renderActiveTable();
+      renderReport();
+      updateDeleteCount();
+      document.getElementById('confirmModal').classList.remove('active');
+      showToast(`Deleted ${toDelete.length} entries`, 'success');
+    }
+
+    function exportToExcel() {
+      const fromDate = new Date(document.getElementById('exportFrom').value);
+      const toDate = new Date(document.getElementById('exportTo').value);
+      toDate.setHours(23, 59, 59, 999);
+      const include = document.getElementById('exportInclude').value;
+
+      let filtered = Object.values(entries).filter(e => {
+        const entryDate = new Date(e.logIn);
+        if (entryDate < fromDate || entryDate > toDate) return false;
+        if (include === 'completed') return e.logOut;
+        if (include === 'active') return !e.logOut;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        showToast('No entries to export', 'info');
+        return;
+      }
+
+      const data = filtered.map(e => {
+        const elapsed = e.logOut ? getElapsedTime(e.logIn, e.logOut) : getElapsedTime(e.logIn);
+        return {
+          'Date': new Date(e.logIn).toLocaleDateString(),
+          'Agent Name': e.agent,
+          'Employee ID': e.empId || '',
+          'Team Lead': e.lead,
+          'Work Status': e.ws,
+          'Location': e.loc,
+          'Log In': formatDateTime(e.logIn),
+          'Log Out': e.logOut ? formatDateTime(e.logOut) : '',
+          'Elapsed': formatElapsed(elapsed),
+          'Status': e.logOut ? 'Completed' : 'Active',
+          'Log-In Remarks': e.remarks || '',
+          'Log-Out Remarks': e.logOutRemarks || ''
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+
+      const fileName = `attendance_${document.getElementById('exportFrom').value}_to_${document.getElementById('exportTo').value}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      showToast('Excel file downloaded!', 'success');
+    }
+
+    // Modals
+    function initModals() {
+      // Password Modal
+      document.getElementById('passwordCancel').addEventListener('click', () => {
+        document.getElementById('passwordModal').classList.remove('active');
+        document.getElementById('passwordInput').value = '';
+        pendingTab = null;
+      });
+
+      document.getElementById('passwordSubmit').addEventListener('click', submitPassword);
+      document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitPassword();
+      });
+
+      // Logout Modal
+      document.getElementById('logoutCancel').addEventListener('click', () => {
+        document.getElementById('logoutModal').classList.remove('active');
+        currentLogoutId = null;
+      });
+
+      document.getElementById('logoutSubmit').addEventListener('click', submitLogout);
+
+      // Confirm Modal
+      document.getElementById('confirmCancel').addEventListener('click', () => {
+        document.getElementById('confirmModal').classList.remove('active');
+      });
+
+      document.getElementById('confirmDelete').addEventListener('click', deleteEntries);
+    }
+
+    function openPasswordModal() {
+      document.getElementById('passwordModal').classList.add('active');
+      document.getElementById('passwordInput').focus();
+    }
+
+    function submitPassword() {
+      const input = document.getElementById('passwordInput');
+      if (input.value === PASSWORD) {
+        unlockedTabs[pendingTab] = true;
+        switchTab(pendingTab);
+        document.getElementById('passwordModal').classList.remove('active');
+        input.value = '';
+        pendingTab = null;
+      } else {
+        showToast('Incorrect password', 'error');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    function openLogoutModal(id, name) {
+      currentLogoutId = id;
+      document.getElementById('logoutAgentName').textContent = name;
+      document.getElementById('logoutEmpId').value = '';
+      document.getElementById('logoutRemarks').value = '';
+      document.getElementById('logoutModal').classList.add('active');
+      document.getElementById('logoutEmpId').focus();
+    }
+
+    function submitLogout() {
+      const empId = document.getElementById('logoutEmpId').value.trim();
+      const remarks = document.getElementById('logoutRemarks').value.trim();
+
+      if (!empId) {
+        showToast('Employee ID is required', 'error');
+        return;
+      }
+
+      const entry = entries[currentLogoutId];
+      if (entry) {
+        entry.logOut = Date.now();
+        entry.empId = empId;
+        entry.logOutRemarks = remarks || null;
+        saveEntry(entry);
+        showToast(`👋 ${entry.agent} clocked out at ${formatTime(entry.logOut)}!`, 'success');
+      }
+
+      document.getElementById('logoutModal').classList.remove('active');
+      currentLogoutId = null;
+    }
+
+    // Data Management
+    function saveEntry(entry) {
+      entries[entry.id] = entry;
+      dbRef.child('entries').child(entry.id).set(entry);
+      saveToLocalStorage();
+      renderActiveTable();
+    }
+
+    function saveAgentsAndLeads() {
+      dbRef.child('agents').set(agents);
+      dbRef.child('leads').set(leads);
+      saveToLocalStorage();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('attendance_entries', JSON.stringify(entries));
+      localStorage.setItem('attendance_agents', JSON.stringify(agents));
+      localStorage.setItem('attendance_leads', JSON.stringify(leads));
+    }
+
+    function loadFromLocalStorage() {
+      const savedEntries = localStorage.getItem('attendance_entries');
+      const savedAgents = localStorage.getItem('attendance_agents');
+      const savedLeads = localStorage.getItem('attendance_leads');
+
+      if (savedEntries) entries = JSON.parse(savedEntries);
+      if (savedAgents) agents = JSON.parse(savedAgents);
+      if (savedLeads) leads = JSON.parse(savedLeads);
+
+      renderActiveTable();
+      renderAgentsTags();
+      renderLeadsTags();
+      updateAgentsDatalist();
+      updateLeadsDropdown();
+    }
+
+    function syncFromFirebase() {
+      dbRef.once('value').then(snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          if (data.entries) entries = data.entries;
+          if (data.agents) agents = data.agents;
+          if (data.leads) leads = data.leads;
+
+          saveToLocalStorage();
+          renderActiveTable();
+          renderAgentsTags();
+          renderLeadsTags();
+          updateAgentsDatalist();
+          updateLeadsDropdown();
+        }
+      }).catch(err => {
+        console.error('Firebase sync error:', err);
+      });
+    }
+
+    // Utility Functions
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function formatTime(timestamp) {
+      if (!timestamp) return '—';
+      return new Date(timestamp).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function formatDateTime(timestamp) {
+      if (!timestamp) return '—';
+      return new Date(timestamp).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function getElapsedTime(start, end = Date.now()) {
+      const diff = end - start;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return { days, hours, minutes };
+    }
+
+    function formatElapsed(elapsed) {
+      if (elapsed.days > 0) {
+        return `${elapsed.days}d ${elapsed.hours}h ${elapsed.minutes}m`;
+      }
+      return `${elapsed.hours}h ${elapsed.minutes}m`;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
