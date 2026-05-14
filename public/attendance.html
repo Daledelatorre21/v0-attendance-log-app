@@ -780,17 +780,33 @@
           <div class="tags-list" id="leadsTags"></div>
         </div>
 
-        <div class="admin-card">
+        <div class="admin-card full-width">
           <h3 class="card-title">Delete Entries</h3>
-          <div class="delete-filter">
-            <select class="form-select" id="deleteFilter">
-              <option value="all">All Entries</option>
-              <option value="today">Today</option>
-              <option value="month">This Month</option>
-            </select>
-            <span class="delete-count" id="deleteCount">0 entries</span>
+          <div class="export-form">
+            <div class="form-group">
+              <label class="form-label">From Date</label>
+              <input type="date" class="form-input" id="deleteFrom">
+            </div>
+            <div class="form-group">
+              <label class="form-label">To Date</label>
+              <input type="date" class="form-input" id="deleteTo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Include</label>
+              <select class="form-select" id="deleteInclude">
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">&nbsp;</label>
+              <span class="delete-count" id="deleteCount">0 entries</span>
+            </div>
+            <button class="btn btn-danger" id="deleteEntriesBtn">
+              <span>🗑</span> Delete Entries
+            </button>
           </div>
-          <button class="btn btn-danger" id="deleteEntriesBtn">Delete Entries</button>
         </div>
 
         <div class="admin-card full-width">
@@ -917,6 +933,8 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('exportFrom').value = today;
       document.getElementById('exportTo').value = today;
+      document.getElementById('deleteFrom').value = today;
+      document.getElementById('deleteTo').value = today;
     });
 
     // Firebase Connection Status
@@ -1250,7 +1268,9 @@
     function initAdminPanel() {
       document.getElementById('addAgentsBtn').addEventListener('click', addAgents);
       document.getElementById('addLeadsBtn').addEventListener('click', addLeads);
-      document.getElementById('deleteFilter').addEventListener('change', updateDeleteCount);
+      document.getElementById('deleteFrom').addEventListener('change', updateDeleteCount);
+      document.getElementById('deleteTo').addEventListener('change', updateDeleteCount);
+      document.getElementById('deleteInclude').addEventListener('change', updateDeleteCount);
       document.getElementById('deleteEntriesBtn').addEventListener('click', confirmDeleteEntries);
       document.getElementById('exportBtn').addEventListener('click', exportToExcel);
     }
@@ -1331,41 +1351,47 @@
     }
 
     function updateDeleteCount() {
-      const filter = document.getElementById('deleteFilter').value;
-      const count = getFilteredEntries(filter).length;
+      const count = getDeleteFilteredEntries().length;
       document.getElementById('deleteCount').textContent = `${count} entries`;
     }
 
-    function getFilteredEntries(filter) {
-      const now = new Date();
-      const today = now.toDateString();
-      const thisMonth = now.getMonth();
-      const thisYear = now.getFullYear();
+    function getDeleteFilteredEntries() {
+      const fromDate = document.getElementById('deleteFrom').value;
+      const toDate = document.getElementById('deleteTo').value;
+      const include = document.getElementById('deleteInclude').value;
+
+      if (!fromDate || !toDate) return [];
+
+      const fromTime = new Date(fromDate).setHours(0, 0, 0, 0);
+      const toTime = new Date(toDate).setHours(23, 59, 59, 999);
 
       return Object.values(entries).filter(e => {
-        if (filter === 'all') return true;
-        const entryDate = new Date(e.logIn);
-        if (filter === 'today') return entryDate.toDateString() === today;
-        if (filter === 'month') return entryDate.getMonth() === thisMonth && entryDate.getFullYear() === thisYear;
+        const entryTime = new Date(e.logIn).getTime();
+        const inRange = entryTime >= fromTime && entryTime <= toTime;
+        
+        if (!inRange) return false;
+        
+        if (include === 'completed') return e.logOut !== null;
+        if (include === 'active') return e.logOut === null;
         return true;
       });
     }
 
     function confirmDeleteEntries() {
-      const filter = document.getElementById('deleteFilter').value;
-      const count = getFilteredEntries(filter).length;
+      const count = getDeleteFilteredEntries().length;
       if (count === 0) {
         showToast('No entries to delete', 'info');
         return;
       }
+      const fromDate = document.getElementById('deleteFrom').value;
+      const toDate = document.getElementById('deleteTo').value;
       document.getElementById('confirmMessage').textContent =
-        `Are you sure you want to delete ${count} entries? This action cannot be undone.`;
+        `Are you sure you want to delete ${count} entries from ${fromDate} to ${toDate}? This action cannot be undone.`;
       document.getElementById('confirmModal').classList.add('active');
     }
 
     function deleteEntries() {
-      const filter = document.getElementById('deleteFilter').value;
-      const toDelete = getFilteredEntries(filter);
+      const toDelete = getDeleteFilteredEntries();
 
       toDelete.forEach(e => {
         delete entries[e.id];
