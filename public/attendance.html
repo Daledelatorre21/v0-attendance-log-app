@@ -118,7 +118,6 @@
     .day-content.expanded { display: block; }
 
     .export-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
-
     .settings-admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
     .settings-admin-card { background: #f9fafb; border-radius: 12px; padding: 1.25rem; border: 1px solid #e5e7eb; }
     .settings-admin-card textarea { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 0.9rem; resize: vertical; min-height: 80px; margin-bottom: 0.75rem; background: white; }
@@ -127,7 +126,6 @@
     .tag { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; background: white; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.85rem; }
     .tag-remove { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; transition: color 0.2s; }
     .tag-remove:hover { color: #ef4444; }
-
     .pw-list { display: flex; flex-direction: column; gap: 0.75rem; }
     .pw-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; flex-wrap: wrap; }
     .pw-item-id { font-weight: 600; flex: 1; font-size: 0.9rem; min-width: 120px; }
@@ -295,7 +293,6 @@
   </header>
 
   <main class="main">
-    <!-- New Entry Tab -->
     <div class="tab-content active" id="tab-entry">
       <div class="card">
         <h2 class="card-title">Log Attendance</h2>
@@ -307,24 +304,18 @@
           </div>
           <div class="form-group">
             <label class="form-label">Team Lead <span class="required">*</span></label>
-            <select class="form-select" id="teamLead" required>
-              <option value="">Select Lead</option>
-            </select>
+            <select class="form-select" id="teamLead" required><option value="">Select Lead</option></select>
           </div>
           <div class="form-group">
             <label class="form-label">Work Status <span class="required">*</span></label>
             <select class="form-select" id="workStatus" required>
-              <option value="">Select Status</option>
-              <option value="WIO">WIO</option>
-              <option value="WFH">WFH</option>
+              <option value="">Select Status</option><option value="WIO">WIO</option><option value="WFH">WFH</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">Location <span class="required">*</span></label>
             <select class="form-select" id="location" required>
-              <option value="">Select Location</option>
-              <option value="Cebu">Cebu</option>
-              <option value="Manila">Manila</option>
+              <option value="">Select Location</option><option value="Cebu">Cebu</option><option value="Manila">Manila</option>
             </select>
           </div>
           <div class="form-group remarks">
@@ -356,7 +347,6 @@
       </div>
     </div>
 
-    <!-- Report Tab -->
     <div class="tab-content" id="tab-report">
       <div class="card">
         <h2 class="card-title">Completed Entries</h2>
@@ -527,11 +517,21 @@
     const password = document.getElementById('loginPassword').value;
     document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
+
+    // Admin login
     if (loginId.toLowerCase() === 'admin') {
       if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; enterApp(); }
       else showLoginError('Invalid Agent ID or password.');
       return;
     }
+
+    // ── KEY FIX: reject unregistered agent IDs ──
+    const isRegistered = agents.some(a => a.toLowerCase() === loginId.toLowerCase());
+    if (!isRegistered) {
+      showLoginError('Agent ID is not registered. Please contact your admin.');
+      return;
+    }
+
     dbRef.child('user_passwords').child(sanitizeKey(loginId)).once('value').then(snap => {
       const stored = snap.val();
       if (stored === null) {
@@ -570,7 +570,6 @@
     document.getElementById('appPage').classList.add('show');
     document.getElementById('userChip').textContent = currentUser.id;
     if (currentUser.isAdmin) document.getElementById('reportAdminTools').style.display = 'block';
-    // Hide action column header for agents
     if (!currentUser.isAdmin) document.getElementById('actionHeader').style.display = 'none';
     initApp();
   }
@@ -583,6 +582,7 @@
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginError').style.display = 'none';
     document.getElementById('reportAdminTools').style.display = 'none';
+    document.getElementById('actionHeader').style.display = '';
   }
 
   // INIT APP
@@ -631,7 +631,6 @@
       if (document.getElementById('submitBtn').classList.contains('btn-danger')) handleFormLogout();
       else handleLogIn();
     });
-    // Trigger check in case agent already has active entry
     if (currentUser && !currentUser.isAdmin) setTimeout(handleAgentInput, 500);
   }
 
@@ -682,22 +681,14 @@
   function submitSelfLogout() {
     const remarks = document.getElementById('logoutRemarks').value.trim();
     const entry = entries[selfLogoutId];
-    if (entry) {
-      entry.logOut = Date.now();
-      entry.logOutRemarks = remarks || null;
-      saveEntry(entry);
-      showToast(`👋 ${entry.agent} clocked out!`, 'success');
-    }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || null; saveEntry(entry); showToast(`👋 ${entry.agent} clocked out!`, 'success'); }
     document.getElementById('logoutModal').classList.remove('active');
     selfLogoutId = null; resetForm();
   }
 
   function resetForm() {
     document.getElementById('entryForm').reset();
-    if (currentUser && !currentUser.isAdmin) {
-      document.getElementById('agentName').value = currentUser.id;
-      document.getElementById('agentName').disabled = true;
-    }
+    if (currentUser && !currentUser.isAdmin) { document.getElementById('agentName').value = currentUser.id; document.getElementById('agentName').disabled = true; }
     ['teamLead','workStatus','location'].forEach(id => document.getElementById(id).disabled = false);
     document.getElementById('infoNote').classList.remove('visible');
     const btn = document.getElementById('submitBtn');
@@ -710,9 +701,7 @@
     const emptyState = document.getElementById('activeEmpty');
     const today = new Date().toDateString();
     let activeEntries = Object.values(entries).filter(e => !e.logOut && new Date(e.logIn).toDateString() === today);
-    if (currentUser && !currentUser.isAdmin) {
-      activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
-    }
+    if (currentUser && !currentUser.isAdmin) activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
     activeEntries.sort((a, b) => b.logIn - a.logIn);
     if (!activeEntries.length) { tbody.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
@@ -721,19 +710,13 @@
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       let elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
-      // Only admin sees Force Log Out button; agents see no action button
-      const actionBtn = currentUser.isAdmin
-        ? `<button class="btn btn-danger btn-sm" onclick="openForceLogout('${entry.id}','${entry.agent}')">Force Log Out</button>`
-        : '';
+      const actionBtn = currentUser.isAdmin ? `<button class="btn btn-danger btn-sm" onclick="openForceLogout('${entry.id}','${entry.agent}')">Force Log Out</button>` : '';
       return `<tr class="${isOverdue ? 'overdue' : ''}">
-        <td><strong>${entry.agent}</strong></td>
-        <td>${entry.lead}</td>
+        <td><strong>${entry.agent}</strong></td><td>${entry.lead}</td>
         <td class="mono">${formatTime(entry.logIn)}</td>
         <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
         <td>${isOverdue ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}</td>
-        <td>${entry.loc}</td>
-        <td>${entry.remarks || '—'}</td>
-        <td>${actionBtn}</td>
+        <td>${entry.loc}</td><td>${entry.remarks || '—'}</td><td>${actionBtn}</td>
       </tr>`;
     }).join('');
   }
@@ -754,12 +737,7 @@
     const remarks = document.getElementById('forceLogoutRemarks').value.trim();
     if (pw !== ADMIN_PASSWORD) { showToast('Incorrect admin password', 'error'); return; }
     const entry = entries[forceLogoutId];
-    if (entry) {
-      entry.logOut = Date.now();
-      entry.logOutRemarks = remarks || 'Force logout by admin';
-      saveEntry(entry);
-      showToast(`👋 ${entry.agent} force logged out!`, 'success');
-    }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || 'Force logout by admin'; saveEntry(entry); showToast(`👋 ${entry.agent} force logged out!`, 'success'); }
     closeForceLogout();
   }
 
@@ -768,9 +746,7 @@
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
     let completedEntries = Object.values(entries).filter(e => e.logOut);
-    if (currentUser && !currentUser.isAdmin) {
-      completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
-    }
+    if (currentUser && !currentUser.isAdmin) completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
     if (!completedEntries.length) { content.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
     const grouped = {};
@@ -814,19 +790,12 @@
   }
 
   function closeSettings() { document.getElementById('settingsOverlay').classList.remove('active'); }
-
   document.getElementById('settingsPasswordInput').addEventListener('keypress', e => { if (e.key === 'Enter') unlockSettings(); });
 
   function unlockSettings() {
     const pw = document.getElementById('settingsPasswordInput').value;
-    if (pw === SETTINGS_PASSWORD) {
-      settingsUnlocked = true;
-      document.getElementById('settingsLock').style.display = 'none';
-      document.getElementById('settingsMenu').style.display = 'block';
-    } else {
-      showToast('Incorrect password', 'error');
-      document.getElementById('settingsPasswordInput').value = '';
-    }
+    if (pw === SETTINGS_PASSWORD) { settingsUnlocked = true; document.getElementById('settingsLock').style.display = 'none'; document.getElementById('settingsMenu').style.display = 'block'; }
+    else { showToast('Incorrect password', 'error'); document.getElementById('settingsPasswordInput').value = ''; }
   }
 
   function showSettingsView(view) {
@@ -889,7 +858,7 @@
       container.innerHTML = results.map(r => `
         <div class="pw-item">
           <div class="pw-item-id">${r.id}</div>
-          <div class="pw-item-pw">${r.pw === null ? '<em style="color:#9ca3af">(not set)</em>' : '••••••'}</div>
+          <div class="pw-item-pw">${r.pw === null ? '<em style="color:#f59e0b">(not set)</em>' : '••••••'}</div>
           <input type="password" class="pw-item-input" id="pw_${sanitizeKey(r.id)}" placeholder="New password" maxlength="20">
           <button class="btn btn-primary btn-sm" onclick="changeAgentPassword('${r.id}')">Save</button>
           <button class="btn btn-warning btn-sm" onclick="resetAgentPassword('${r.id}')">Reset</button>
@@ -903,17 +872,14 @@
     const newPw = input.value.trim();
     if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
     dbRef.child('user_passwords').child(sanitizeKey(agentId)).set(newPw).then(() => {
-      showToast(`Password updated for ${agentId}`, 'success');
-      input.value = '';
-      renderAgentPasswordsList();
+      showToast(`Password updated for ${agentId}`, 'success'); input.value = ''; renderAgentPasswordsList();
     });
   }
 
   function resetAgentPassword(agentId) {
     if (!confirm(`Reset password for ${agentId}? They will be prompted to create a new one on next login.`)) return;
     dbRef.child('user_passwords').child(sanitizeKey(agentId)).remove().then(() => {
-      showToast(`Password reset for ${agentId}`, 'success');
-      renderAgentPasswordsList();
+      showToast(`Password reset for ${agentId}`, 'success'); renderAgentPasswordsList();
     });
   }
 
@@ -986,17 +952,8 @@
   }
 
   // DATA
-  function saveEntry(entry) {
-    entries[entry.id] = entry;
-    dbRef.child('entries').child(entry.id).set(entry);
-    saveToLocalStorage(); renderActiveTable();
-  }
-
-  function saveAgentsAndLeads() {
-    dbRef.child('agents').set(agents);
-    dbRef.child('leads').set(leads);
-    saveToLocalStorage();
-  }
+  function saveEntry(entry) { entries[entry.id] = entry; dbRef.child('entries').child(entry.id).set(entry); saveToLocalStorage(); renderActiveTable(); }
+  function saveAgentsAndLeads() { dbRef.child('agents').set(agents); dbRef.child('leads').set(leads); saveToLocalStorage(); }
 
   function saveToLocalStorage() {
     localStorage.setItem('attendance_entries', JSON.stringify(entries));
