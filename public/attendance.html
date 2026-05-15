@@ -145,8 +145,8 @@
     .settings-overlay.active { display: flex; }
     .settings-modal { background: white; border-radius: 20px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
     .settings-header { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 1; border-radius: 20px 20px 0 0; }
-    .settings-title { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .settings-close { background: none; border: none; cursor: pointer; color: #6b7280; font-size: 1.5rem; line-height: 1; transition: color 0.2s; }
+    .settings-title { font-size: 1.2rem; font-weight: 700; }
+    .settings-close { background: none; border: none; cursor: pointer; color: #6b7280; font-size: 1.5rem; line-height: 1; }
     .settings-close:hover { color: #1f2937; }
     .settings-body { padding: 1.5rem; }
     .settings-lock { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
@@ -508,35 +508,41 @@
   let ADMIN_PASSWORD = 'Pineapple';
   const SETTINGS_PASSWORD = 'Glendale';
 
-  // ── PRELOAD agents + config from Firebase on page load ──
-  // This ensures the agents list is ready before anyone clicks Sign In
-  function preloadData() {
-    dbRef.once('value').then(snap => {
-      const data = snap.val();
-      if (data) {
-        if (data.agents) agents = data.agents;
-        if (data.leads) leads = data.leads;
-        if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
-        // Update localStorage
-        localStorage.setItem('attendance_agents', JSON.stringify(agents));
-        localStorage.setItem('attendance_leads', JSON.stringify(leads));
-      }
-    }).catch(() => {
-      // Fall back to localStorage if Firebase fails
-      const a = localStorage.getItem('attendance_agents');
-      if (a) agents = JSON.parse(a);
-    });
-  }
-
-  // Load from localStorage immediately for instant availability
-  // then Firebase will update it in background
+  // ── PRELOAD agents from localStorage instantly, then refresh from Firebase ──
   (function initData() {
     const a = localStorage.getItem('attendance_agents');
     const l = localStorage.getItem('attendance_leads');
     if (a) agents = JSON.parse(a);
     if (l) leads = JSON.parse(l);
-    preloadData(); // also fetch fresh from Firebase in background
+    // Refresh from Firebase in background
+    dbRef.once('value').then(snap => {
+      const data = snap.val();
+      if (data) {
+        if (data.agents) { agents = data.agents; localStorage.setItem('attendance_agents', JSON.stringify(agents)); }
+        if (data.leads) { leads = data.leads; localStorage.setItem('attendance_leads', JSON.stringify(leads)); }
+        if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
+      }
+    });
   })();
+
+  // ── RESTORE SESSION on refresh (sessionStorage — cleared when tab closes) ──
+  (function restoreSession() {
+    const saved = sessionStorage.getItem('currentUser');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+      showApp();
+    }
+  })();
+
+  function showApp() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('setPasswordPage').classList.remove('show');
+    document.getElementById('appPage').classList.add('show');
+    document.getElementById('userChip').textContent = currentUser.id;
+    if (currentUser.isAdmin) document.getElementById('reportAdminTools').style.display = 'block';
+    if (!currentUser.isAdmin) document.getElementById('actionHeader').style.display = 'none';
+    initApp();
+  }
 
   // LOGIN
   function handleLogin() {
@@ -545,21 +551,15 @@
     document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
 
-    // Admin login — instant, no Firebase call needed
     if (loginId.toLowerCase() === 'admin') {
-      if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; enterApp(); }
+      if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); showApp(); }
       else showLoginError('Invalid Agent ID or password.');
       return;
     }
 
-    // Check if agent is registered (uses preloaded list — instant)
     const isRegistered = agents.some(a => a.toLowerCase() === loginId.toLowerCase());
-    if (!isRegistered) {
-      showLoginError('Agent ID is not registered. Please contact your admin.');
-      return;
-    }
+    if (!isRegistered) { showLoginError('Agent ID is not registered. Please contact your admin.'); return; }
 
-    // Check password from Firebase
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in...';
 
@@ -572,12 +572,10 @@
         document.getElementById('setPasswordPage').classList.add('show');
       } else if (stored === password) {
         currentUser = { id: loginId, isAdmin: false };
-        enterApp();
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        showApp();
       } else showLoginError('Invalid Agent ID or password.');
-    }).catch(() => {
-      btn.disabled = false; btn.textContent = 'Sign In';
-      showLoginError('Connection error. Please try again.');
-    });
+    }).catch(() => { btn.disabled = false; btn.textContent = 'Sign In'; showLoginError('Connection error. Please try again.'); });
   }
 
   function showLoginError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
@@ -592,25 +590,17 @@
     if (newPw !== confirmPw) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
     dbRef.child('user_passwords').child(sanitizeKey(pendingLoginId)).set(newPw).then(() => {
       currentUser = { id: pendingLoginId, isAdmin: false };
-      document.getElementById('setPasswordPage').classList.remove('show');
-      enterApp();
+      sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showApp();
     }).catch(() => { errEl.textContent = 'Error saving. Try again.'; errEl.style.display = 'block'; });
   }
 
   function sanitizeKey(str) { return str.replace(/[.#$[\]]/g, '_'); }
 
-  function enterApp() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('setPasswordPage').classList.remove('show');
-    document.getElementById('appPage').classList.add('show');
-    document.getElementById('userChip').textContent = currentUser.id;
-    if (currentUser.isAdmin) document.getElementById('reportAdminTools').style.display = 'block';
-    if (!currentUser.isAdmin) document.getElementById('actionHeader').style.display = 'none';
-    initApp();
-  }
-
   function handleSignOut() {
-    currentUser = null; settingsUnlocked = false;
+    currentUser = null;
+    sessionStorage.removeItem('currentUser');
+    settingsUnlocked = false;
     document.getElementById('appPage').classList.remove('show');
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('loginId').value = '';
@@ -626,9 +616,25 @@
     initNavigation();
     initEntryForm();
     loadFromLocalStorage();
-    syncFromFirebase();
-    setInterval(() => renderActiveTable(), 30000);
-    setInterval(syncFromFirebase, 15000);
+
+    // ── REAL-TIME LISTENER — updates instantly on all devices ──
+    dbRef.on('value', snap => {
+      const data = snap.val();
+      if (data) {
+        if (data.entries) entries = data.entries;
+        if (data.agents) { agents = data.agents; localStorage.setItem('attendance_agents', JSON.stringify(agents)); updateAgentsDatalist(); }
+        if (data.leads) { leads = data.leads; localStorage.setItem('attendance_leads', JSON.stringify(leads)); updateLeadsDropdown(); }
+        if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
+        localStorage.setItem('attendance_entries', JSON.stringify(entries));
+        renderActiveTable();
+        const activeTab = document.querySelector('.nav-btn.active')?.dataset?.tab;
+        if (activeTab === 'report') renderReport();
+      }
+    });
+
+    // Also update elapsed times every 5 seconds
+    setInterval(() => renderActiveTable(), 5000);
+
     const today = new Date().toISOString().split('T')[0];
     ['exportFrom','exportTo','deleteFrom','deleteTo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = today; });
   }
@@ -954,7 +960,8 @@
   function deleteEntries() {
     const toDelete = getDeleteFilteredEntries();
     toDelete.forEach(e => { delete entries[e.id]; dbRef.child('entries').child(e.id).remove(); });
-    saveToLocalStorage(); renderActiveTable(); renderReport();
+    localStorage.setItem('attendance_entries', JSON.stringify(entries));
+    renderActiveTable(); renderReport();
     document.getElementById('confirmModal').classList.remove('active');
     showToast(`Deleted ${toDelete.length} entries`, 'success');
   }
@@ -984,32 +991,21 @@
   }
 
   // DATA
-  function saveEntry(entry) { entries[entry.id] = entry; dbRef.child('entries').child(entry.id).set(entry); saveToLocalStorage(); renderActiveTable(); }
-  function saveAgentsAndLeads() { dbRef.child('agents').set(agents); dbRef.child('leads').set(leads); saveToLocalStorage(); }
+  function saveEntry(entry) {
+    entries[entry.id] = entry;
+    dbRef.child('entries').child(entry.id).set(entry); // Firebase real-time listener handles UI update
+  }
 
-  function saveToLocalStorage() {
-    localStorage.setItem('attendance_entries', JSON.stringify(entries));
+  function saveAgentsAndLeads() {
+    dbRef.child('agents').set(agents);
+    dbRef.child('leads').set(leads);
     localStorage.setItem('attendance_agents', JSON.stringify(agents));
     localStorage.setItem('attendance_leads', JSON.stringify(leads));
   }
 
   function loadFromLocalStorage() {
     const e = localStorage.getItem('attendance_entries');
-    if (e) entries = JSON.parse(e);
-    renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown();
-  }
-
-  function syncFromFirebase() {
-    dbRef.once('value').then(snap => {
-      const data = snap.val();
-      if (data) {
-        if (data.entries) entries = data.entries;
-        if (data.agents) agents = data.agents;
-        if (data.leads) leads = data.leads;
-        if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
-        saveToLocalStorage(); renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown();
-      }
-    }).catch(err => console.error('Firebase sync error:', err));
+    if (e) { entries = JSON.parse(e); renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown(); }
   }
 
   // UTILS
