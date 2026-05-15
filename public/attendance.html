@@ -30,6 +30,7 @@
     .login-btn { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #1a6fc4, #0ea5a0); color: white; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s, transform 0.1s; }
     .login-btn:hover { opacity: 0.9; }
     .login-btn:active { transform: scale(0.98); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .login-error { color: #ef4444; font-size: 0.85rem; text-align: center; margin-top: 0.75rem; display: none; }
     .login-footer { text-align: center; color: #9ca3af; font-size: 0.8rem; margin-top: 1.5rem; }
 
@@ -212,8 +213,8 @@
         <label>Password</label>
         <input type="password" class="login-input" id="loginPassword" placeholder="Enter password" maxlength="20">
       </div>
-      <p class="login-error" id="loginError">Invalid Agent ID or password.</p>
-      <button class="login-btn" onclick="handleLogin()">Sign In</button>
+      <p class="login-error" id="loginError"></p>
+      <button class="login-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
     </div>
     <p class="login-footer">Track · Secure Access</p>
   </div>
@@ -326,16 +327,12 @@
         </form>
         <div class="info-note" id="infoNote"></div>
       </div>
-
       <div class="card">
         <h2 class="card-title">Today's Active Entries</h2>
         <div class="table-container">
           <table>
             <thead>
-              <tr>
-                <th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th>
-                <th>Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th>
-              </tr>
+              <tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th><th>Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th></tr>
             </thead>
             <tbody id="activeTableBody"></tbody>
           </table>
@@ -511,6 +508,36 @@
   let ADMIN_PASSWORD = 'Pineapple';
   const SETTINGS_PASSWORD = 'Glendale';
 
+  // ── PRELOAD agents + config from Firebase on page load ──
+  // This ensures the agents list is ready before anyone clicks Sign In
+  function preloadData() {
+    dbRef.once('value').then(snap => {
+      const data = snap.val();
+      if (data) {
+        if (data.agents) agents = data.agents;
+        if (data.leads) leads = data.leads;
+        if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
+        // Update localStorage
+        localStorage.setItem('attendance_agents', JSON.stringify(agents));
+        localStorage.setItem('attendance_leads', JSON.stringify(leads));
+      }
+    }).catch(() => {
+      // Fall back to localStorage if Firebase fails
+      const a = localStorage.getItem('attendance_agents');
+      if (a) agents = JSON.parse(a);
+    });
+  }
+
+  // Load from localStorage immediately for instant availability
+  // then Firebase will update it in background
+  (function initData() {
+    const a = localStorage.getItem('attendance_agents');
+    const l = localStorage.getItem('attendance_leads');
+    if (a) agents = JSON.parse(a);
+    if (l) leads = JSON.parse(l);
+    preloadData(); // also fetch fresh from Firebase in background
+  })();
+
   // LOGIN
   function handleLogin() {
     const loginId = document.getElementById('loginId').value.trim();
@@ -518,22 +545,27 @@
     document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
 
-    // Admin login
+    // Admin login — instant, no Firebase call needed
     if (loginId.toLowerCase() === 'admin') {
       if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; enterApp(); }
       else showLoginError('Invalid Agent ID or password.');
       return;
     }
 
-    // ── KEY FIX: reject unregistered agent IDs ──
+    // Check if agent is registered (uses preloaded list — instant)
     const isRegistered = agents.some(a => a.toLowerCase() === loginId.toLowerCase());
     if (!isRegistered) {
       showLoginError('Agent ID is not registered. Please contact your admin.');
       return;
     }
 
+    // Check password from Firebase
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = 'Signing in...';
+
     dbRef.child('user_passwords').child(sanitizeKey(loginId)).once('value').then(snap => {
       const stored = snap.val();
+      btn.disabled = false; btn.textContent = 'Sign In';
       if (stored === null) {
         pendingLoginId = loginId;
         document.getElementById('loginPage').style.display = 'none';
@@ -542,7 +574,10 @@
         currentUser = { id: loginId, isAdmin: false };
         enterApp();
       } else showLoginError('Invalid Agent ID or password.');
-    }).catch(() => showLoginError('Connection error. Please try again.'));
+    }).catch(() => {
+      btn.disabled = false; btn.textContent = 'Sign In';
+      showLoginError('Connection error. Please try again.');
+    });
   }
 
   function showLoginError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
@@ -621,10 +656,7 @@
 
   function initEntryForm() {
     const agentInput = document.getElementById('agentName');
-    if (currentUser && !currentUser.isAdmin) {
-      agentInput.value = currentUser.id;
-      agentInput.disabled = true;
-    }
+    if (currentUser && !currentUser.isAdmin) { agentInput.value = currentUser.id; agentInput.disabled = true; }
     agentInput.addEventListener('input', handleAgentInput);
     document.getElementById('entryForm').addEventListener('submit', e => {
       e.preventDefault();
@@ -963,11 +995,7 @@
 
   function loadFromLocalStorage() {
     const e = localStorage.getItem('attendance_entries');
-    const a = localStorage.getItem('attendance_agents');
-    const l = localStorage.getItem('attendance_leads');
     if (e) entries = JSON.parse(e);
-    if (a) agents = JSON.parse(a);
-    if (l) leads = JSON.parse(l);
     renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown();
   }
 
