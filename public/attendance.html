@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attendance Log</title>
+  <title>Track — Attendance Log</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,11 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'DM Sans', sans-serif;
@@ -24,9 +20,162 @@
       color: #1f2937;
     }
 
-    .mono {
-      font-family: 'DM Mono', monospace;
+    .mono { font-family: 'DM Mono', monospace; }
+
+    /* ── LOGIN PAGE ── */
+    #loginPage {
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%);
+      padding: 1rem;
     }
+
+    .login-card {
+      background: white;
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .track-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .track-logo-icon {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+
+    .track-logo-icon svg.clock {
+      width: 48px;
+      height: 48px;
+    }
+
+    .track-logo-icon .check-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      width: 20px;
+      height: 20px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+    }
+
+    .track-logo-text {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .login-form .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .login-form label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin-bottom: 0.4rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #f9fafb;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #1a6fc4;
+      box-shadow: 0 0 0 3px rgba(26,111,196,0.1);
+      background: white;
+    }
+
+    .login-input.placeholder-style::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .login-btn:hover { opacity: 0.9; }
+    .login-btn:active { transform: scale(0.98); }
+
+    .login-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    .login-footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.8rem;
+      margin-top: 1.5rem;
+    }
+
+    /* ── SET PASSWORD PAGE ── */
+    #setPasswordPage {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%);
+      padding: 1rem;
+    }
+
+    #setPasswordPage.show { display: flex; }
+
+    /* ── MAIN APP ── */
+    #appPage { display: none; }
+    #appPage.show { display: block; }
 
     /* Header */
     .header {
@@ -46,31 +195,76 @@
       justify-content: space-between;
     }
 
-    .logo {
+    .header-logo {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1f2937;
+      gap: 0.4rem;
     }
 
-    .logo svg {
-      width: 24px;
-      height: 24px;
-      color: #3b6ef8;
+    .header-logo-icon {
+      position: relative;
+      width: 32px;
+      height: 32px;
+    }
+
+    .header-logo-icon svg { width: 32px; height: 32px; }
+
+    .header-logo-icon .check-badge-sm {
+      position: absolute;
+      bottom: -1px;
+      right: -3px;
+      width: 13px;
+      height: 13px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid white;
+    }
+
+    .header-logo-text {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
-    .nav {
+    .user-chip {
       display: flex;
+      align-items: center;
       gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
+      color: white;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
+
+    .signout-btn {
+      padding: 0.4rem 0.85rem;
+      background: none;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .signout-btn:hover { background: #f9fafb; color: #1f2937; }
+
+    .nav { display: flex; gap: 0.5rem; }
 
     .nav-btn {
       padding: 0.5rem 1rem;
@@ -85,13 +279,8 @@
       transition: color 0.2s;
     }
 
-    .nav-btn:hover {
-      color: #3b6ef8;
-    }
-
-    .nav-btn.active {
-      color: #3b6ef8;
-    }
+    .nav-btn:hover { color: #1a6fc4; }
+    .nav-btn.active { color: #1a6fc4; }
 
     .nav-btn.active::after {
       content: '';
@@ -100,7 +289,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: #3b6ef8;
+      background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
       border-radius: 2px;
     }
 
@@ -121,10 +310,7 @@
       animation: pulse 2s infinite;
     }
 
-    .live-dot.disconnected {
-      background: #ef4444;
-      animation: none;
-    }
+    .live-dot.disconnected { background: #ef4444; animation: none; }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -132,19 +318,10 @@
     }
 
     /* Main Content */
-    .main {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
+    .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
 
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     /* Cards */
     .card {
@@ -178,19 +355,10 @@
       min-width: 150px;
     }
 
-    .form-group.remarks {
-      flex: 2;
-    }
+    .form-group.remarks { flex: 2; }
 
-    .form-label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #4b5563;
-    }
-
-    .form-label .required {
-      color: #ef4444;
-    }
+    .form-label { font-size: 0.85rem; font-weight: 500; color: #4b5563; }
+    .form-label .required { color: #ef4444; }
 
     .form-input, .form-select {
       padding: 0.65rem 0.85rem;
@@ -203,8 +371,8 @@
 
     .form-input:focus, .form-select:focus {
       outline: none;
-      border-color: #3b6ef8;
-      box-shadow: 0 0 0 3px rgba(59, 110, 248, 0.1);
+      border-color: #1a6fc4;
+      box-shadow: 0 0 0 3px rgba(26,111,196,0.1);
     }
 
     .form-input:disabled, .form-select:disabled {
@@ -228,50 +396,16 @@
       white-space: nowrap;
     }
 
-    .btn-primary {
-      background: #3b6ef8;
-      color: white;
-    }
+    .btn-primary { background: #1a6fc4; color: white; }
+    .btn-primary:hover { background: #1560ad; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-outline { background: white; border: 1px solid #e5e7eb; color: #4b5563; }
+    .btn-outline:hover { background: #f9fafb; }
+    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
 
-    .btn-primary:hover {
-      background: #2d5ae0;
-    }
-
-    .btn-danger {
-      background: #ef4444;
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #dc2626;
-    }
-
-    .btn-success {
-      background: #16a34a;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: #15803d;
-    }
-
-    .btn-outline {
-      background: white;
-      border: 1px solid #e5e7eb;
-      color: #4b5563;
-    }
-
-    .btn-outline:hover {
-      background: #f9fafb;
-      border-color: #d1d5db;
-    }
-
-    .btn-sm {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.85rem;
-    }
-
-    /* Info Note */
     .info-note {
       display: none;
       padding: 0.75rem 1rem;
@@ -283,44 +417,18 @@
       margin-top: 1rem;
     }
 
-    .info-note.visible {
-      display: block;
-    }
+    .info-note.visible { display: block; }
 
     /* Tables */
-    .table-container {
-      overflow-x: auto;
-    }
+    .table-container { overflow-x: auto; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
-    th, td {
-      padding: 0.75rem 1rem;
-      text-align: left;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    th {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #6b7280;
-      background: #f9fafb;
-    }
-
-    td {
-      font-size: 0.9rem;
-    }
-
-    tr:hover {
-      background: #f9fafb;
-    }
-
-    tr.overdue {
-      background: #fff1f1 !important;
-    }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { font-size: 0.85rem; font-weight: 600; color: #6b7280; background: #f9fafb; }
+    td { font-size: 0.9rem; }
+    tr:hover { background: #f9fafb; }
+    tr.overdue { background: #fff1f1 !important; }
 
     .badge {
       display: inline-flex;
@@ -332,29 +440,16 @@
       font-weight: 600;
     }
 
-    .badge-success {
-      background: #dcfce7;
-      color: #16a34a;
-    }
-
-    .badge-warning {
-      background: #fef3c7;
-      color: #d97706;
-    }
-
-    .badge-danger {
-      background: #fee2e2;
-      color: #ef4444;
-    }
+    .badge-success { background: #dcfce7; color: #16a34a; }
+    .badge-warning { background: #fef3c7; color: #d97706; }
+    .badge-danger { background: #fee2e2; color: #ef4444; }
 
     .elapsed-green { color: #16a34a; }
     .elapsed-amber { color: #d97706; }
     .elapsed-red { color: #ef4444; }
 
     /* Report Tab */
-    .month-group {
-      margin-bottom: 1rem;
-    }
+    .month-group { margin-bottom: 1rem; }
 
     .group-header {
       display: flex;
@@ -368,33 +463,13 @@
       transition: background 0.2s;
     }
 
-    .group-header:hover {
-      background: #f3f4f6;
-    }
+    .group-header:hover { background: #f3f4f6; }
+    .group-header svg { width: 20px; height: 20px; color: #6b7280; transition: transform 0.2s; }
+    .group-header.expanded svg { transform: rotate(90deg); }
+    .group-content { display: none; padding: 0.5rem 0 0.5rem 1.5rem; }
+    .group-content.expanded { display: block; }
 
-    .group-header svg {
-      width: 20px;
-      height: 20px;
-      color: #6b7280;
-      transition: transform 0.2s;
-    }
-
-    .group-header.expanded svg {
-      transform: rotate(90deg);
-    }
-
-    .group-content {
-      display: none;
-      padding: 0.5rem 0 0.5rem 1.5rem;
-    }
-
-    .group-content.expanded {
-      display: block;
-    }
-
-    .day-group {
-      margin-bottom: 0.75rem;
-    }
+    .day-group { margin-bottom: 0.75rem; }
 
     .day-header {
       display: flex;
@@ -410,36 +485,14 @@
       transition: all 0.2s;
     }
 
-    .day-header:hover {
-      border-color: #3b6ef8;
-    }
-
-    .day-header svg {
-      width: 16px;
-      height: 16px;
-      color: #6b7280;
-      transition: transform 0.2s;
-    }
-
-    .day-header.expanded svg {
-      transform: rotate(90deg);
-    }
-
-    .day-content {
-      display: none;
-      margin-top: 0.5rem;
-    }
-
-    .day-content.expanded {
-      display: block;
-    }
+    .day-header:hover { border-color: #1a6fc4; }
+    .day-header svg { width: 16px; height: 16px; color: #6b7280; transition: transform 0.2s; }
+    .day-header.expanded svg { transform: rotate(90deg); }
+    .day-content { display: none; margin-top: 0.5rem; }
+    .day-content.expanded { display: block; }
 
     /* Admin Cards */
-    .admin-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
 
     .admin-card {
       background: white;
@@ -448,9 +501,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .admin-card.full-width {
-      grid-column: 1 / -1;
-    }
+    .admin-card.full-width { grid-column: 1 / -1; }
 
     .admin-card textarea {
       width: 100%;
@@ -466,16 +517,11 @@
 
     .admin-card textarea:focus {
       outline: none;
-      border-color: #3b6ef8;
-      box-shadow: 0 0 0 3px rgba(59, 110, 248, 0.1);
+      border-color: #1a6fc4;
+      box-shadow: 0 0 0 3px rgba(26,111,196,0.1);
     }
 
-    .tags-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
+    .tags-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
 
     .tag {
       display: inline-flex;
@@ -498,35 +544,16 @@
       transition: color 0.2s;
     }
 
-    .tag-remove:hover {
-      color: #ef4444;
-    }
+    .tag-remove:hover { color: #ef4444; }
 
-    .delete-filter {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .delete-count {
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-
-    .export-form {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
+    .export-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
 
     /* Modal */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.5);
       backdrop-filter: blur(4px);
       z-index: 1000;
       align-items: center;
@@ -535,10 +562,7 @@
       transition: opacity 0.2s;
     }
 
-    .modal-overlay.active {
-      display: flex;
-      opacity: 1;
-    }
+    .modal-overlay.active { display: flex; opacity: 1; }
 
     .modal {
       background: white;
@@ -551,27 +575,10 @@
       transition: all 0.2s;
     }
 
-    .modal-overlay.active .modal {
-      transform: scale(1);
-      opacity: 1;
-    }
-
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: #1f2937;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-
-    .modal-actions .btn {
-      flex: 1;
-    }
+    .modal-overlay.active .modal { transform: scale(1); opacity: 1; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .modal-actions .btn { flex: 1; }
 
     /* Toast */
     .toast-container {
@@ -589,7 +596,7 @@
       border-radius: 10px;
       color: white;
       font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       animation: slideIn 0.3s ease;
     }
 
@@ -598,242 +605,308 @@
     .toast.info { background: #1e40af; }
 
     @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
 
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: #9ca3af;
-    }
+    .empty-state { text-align: center; padding: 3rem; color: #9ca3af; }
+    .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5; }
 
-    .empty-state svg {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 1rem;
-      opacity: 0.5;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-      .header {
-        padding: 1rem;
-      }
-
-      .header-content {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .main {
-        padding: 1rem;
-      }
-
-      .entry-form {
-        flex-direction: column;
-      }
-
-      .form-group {
-        width: 100%;
-      }
-
-      .admin-grid {
-        grid-template-columns: 1fr;
-      }
+      .header { padding: 1rem; }
+      .header-content { flex-direction: column; gap: 1rem; }
+      .main { padding: 1rem; }
+      .entry-form { flex-direction: column; }
+      .form-group { width: 100%; }
+      .admin-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-        </svg>
-        Attendance Log
-      </div>
-      <div class="header-right">
-        <nav class="nav">
-          <button class="nav-btn active" data-tab="entry">New Entry</button>
-          <button class="nav-btn" data-tab="report">Report</button>
-          <button class="nav-btn" data-tab="admin">Admin</button>
-        </nav>
-        <div class="live-indicator">
-          <span class="live-dot" id="liveDot"></span>
-          <span id="liveText">Live</span>
-        </div>
-      </div>
-    </div>
-  </header>
 
-  <!-- Main Content -->
-  <main class="main">
-    <!-- New Entry Tab -->
-    <div class="tab-content active" id="tab-entry">
-      <div class="card">
-        <h2 class="card-title">Log Attendance</h2>
-        <form class="entry-form" id="entryForm">
-          <div class="form-group">
-            <label class="form-label">Agent Name <span class="required">*</span></label>
-            <input type="text" class="form-input" id="agentName" list="agentsList" required autocomplete="off">
-            <datalist id="agentsList"></datalist>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Team Lead <span class="required">*</span></label>
-            <select class="form-select" id="teamLead" required>
-              <option value="">Select Lead</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Work Status <span class="required">*</span></label>
-            <select class="form-select" id="workStatus" required>
-              <option value="">Select Status</option>
-              <option value="WIO">WIO</option>
-              <option value="WFH">WFH</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Location <span class="required">*</span></label>
-            <select class="form-select" id="location" required>
-              <option value="">Select Location</option>
-              <option value="Cebu">Cebu</option>
-              <option value="Manila">Manila</option>
-            </select>
-          </div>
-          <div class="form-group remarks">
-            <label class="form-label">Remarks</label>
-            <input type="text" class="form-input" id="remarks">
-          </div>
-          <button type="submit" class="btn btn-primary" id="submitBtn">
-            <span>⏱</span> Log In
-          </button>
-        </form>
-        <div class="info-note" id="infoNote"></div>
-      </div>
-
-      <div class="card">
-        <h2 class="card-title">Today's Active Entries</h2>
-        <div class="table-container">
-          <table id="activeTable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Team Lead</th>
-                <th>Log In</th>
-                <th>Log Out</th>
-                <th>Elapsed</th>
-                <th>Status</th>
-                <th>Location</th>
-                <th>Remarks</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="activeTableBody"></tbody>
-          </table>
-        </div>
-        <div class="empty-state" id="activeEmpty" style="display: none;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <!-- ── LOGIN PAGE ── -->
+  <div id="loginPage">
+    <div class="login-card">
+      <div class="track-logo">
+        <div class="track-logo-icon">
+          <svg class="clock" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" stroke="url(#clockGrad)" stroke-width="3" fill="none"/>
+            <line x1="24" y1="10" x2="24" y2="12" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="36" x2="24" y2="38" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="10" y1="24" x2="12" y2="24" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="36" y1="24" x2="38" y2="24" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="24" x2="24" y2="14" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="24" x2="32" y2="28" stroke="url(#clockGrad)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="2" fill="url(#clockGrad)"/>
+            <defs>
+              <linearGradient id="clockGrad" x1="0" y1="0" x2="48" y2="48">
+                <stop offset="0%" stop-color="#1a6fc4"/>
+                <stop offset="100%" stop-color="#0ea5a0"/>
+              </linearGradient>
+            </defs>
           </svg>
-          <p>No active entries today</p>
+          <div class="check-badge">
+            <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+              <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
+        <span class="track-logo-text">Track</span>
       </div>
+      <p class="login-subtitle">Attendance Log System</p>
+      <div class="login-form">
+        <div class="form-group">
+          <label>Login ID</label>
+          <input type="text" class="login-input placeholder-style" id="loginId" placeholder="e.g. Dale.RN" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="login-input" id="loginPassword" placeholder="Enter password">
+        </div>
+        <p class="login-error" id="loginError">Invalid Login ID or password.</p>
+        <button class="login-btn" onclick="handleLogin()">Sign In</button>
+      </div>
+      <p class="login-footer">Track · Secure Access</p>
     </div>
+  </div>
 
-    <!-- Report Tab -->
-    <div class="tab-content" id="tab-report">
-      <div class="card">
-        <h2 class="card-title">Completed Entries</h2>
-        <div id="reportContent"></div>
-        <div class="empty-state" id="reportEmpty" style="display: none;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+  <!-- ── SET PASSWORD PAGE ── -->
+  <div id="setPasswordPage">
+    <div class="login-card">
+      <div class="track-logo">
+        <div class="track-logo-icon">
+          <svg class="clock" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" stroke="url(#clockGrad2)" stroke-width="3" fill="none"/>
+            <line x1="24" y1="10" x2="24" y2="12" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="36" x2="24" y2="38" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="10" y1="24" x2="12" y2="24" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="36" y1="24" x2="38" y2="24" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="24" x2="24" y2="14" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="24" x2="32" y2="28" stroke="url(#clockGrad2)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="2" fill="url(#clockGrad2)"/>
+            <defs>
+              <linearGradient id="clockGrad2" x1="0" y1="0" x2="48" y2="48">
+                <stop offset="0%" stop-color="#1a6fc4"/>
+                <stop offset="100%" stop-color="#0ea5a0"/>
+              </linearGradient>
+            </defs>
           </svg>
-          <p>No completed entries yet</p>
+          <div class="check-badge">
+            <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+              <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
+        <span class="track-logo-text">Track</span>
+      </div>
+      <p class="login-subtitle">Create Your Password</p>
+      <p style="text-align:center;color:#6b7280;font-size:0.9rem;margin-bottom:1.5rem;">Welcome! This is your first time logging in.<br>Please create a password for your account.</p>
+      <div class="login-form">
+        <div class="form-group">
+          <label>New Password <span style="color:#ef4444">*</span></label>
+          <input type="password" class="login-input" id="newPassword" placeholder="Min 4 characters">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password <span style="color:#ef4444">*</span></label>
+          <input type="password" class="login-input" id="confirmPassword" placeholder="Repeat password">
+        </div>
+        <p class="login-error" id="setPasswordError"></p>
+        <button class="login-btn" onclick="handleSetPassword()">Create Password & Sign In</button>
       </div>
     </div>
+  </div>
 
-    <!-- Admin Tab -->
-    <div class="tab-content" id="tab-admin">
-      <div class="admin-grid">
-        <div class="admin-card">
-          <h3 class="card-title">Manage Agents</h3>
-          <textarea id="agentsBulk" placeholder="Enter agent names (one per line)"></textarea>
-          <button class="btn btn-primary" id="addAgentsBtn">Add Agents</button>
-          <div class="tags-list" id="agentsTags"></div>
+  <!-- ── MAIN APP ── -->
+  <div id="appPage">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-logo">
+          <div class="header-logo-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="22" stroke="url(#hGrad)" stroke-width="3" fill="none"/>
+              <line x1="24" y1="10" x2="24" y2="12" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="24" y1="36" x2="24" y2="38" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="10" y1="24" x2="12" y2="24" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="36" y1="24" x2="38" y2="24" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="24" y1="24" x2="24" y2="14" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="24" y1="24" x2="32" y2="28" stroke="url(#hGrad)" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="2" fill="url(#hGrad)"/>
+              <defs>
+                <linearGradient id="hGrad" x1="0" y1="0" x2="48" y2="48">
+                  <stop offset="0%" stop-color="#1a6fc4"/>
+                  <stop offset="100%" stop-color="#0ea5a0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="check-badge-sm">
+              <svg viewBox="0 0 12 12" fill="none" width="8" height="8">
+                <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <span class="header-logo-text">Track</span>
         </div>
-
-        <div class="admin-card">
-          <h3 class="card-title">Manage Team Leads</h3>
-          <textarea id="leadsBulk" placeholder="Enter team lead names (one per line)"></textarea>
-          <button class="btn btn-primary" id="addLeadsBtn">Add Team Leads</button>
-          <div class="tags-list" id="leadsTags"></div>
+        <div class="header-right">
+          <nav class="nav">
+            <button class="nav-btn active" data-tab="entry">New Entry</button>
+            <button class="nav-btn" data-tab="report">Report</button>
+            <button class="nav-btn" data-tab="admin">Admin</button>
+          </nav>
+          <div class="live-indicator">
+            <span class="live-dot" id="liveDot"></span>
+            <span id="liveText">Live</span>
+          </div>
+          <div class="user-chip" id="userChip">Admin</div>
+          <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
         </div>
+      </div>
+    </header>
 
-        <div class="admin-card full-width">
-          <h3 class="card-title">Delete Entries</h3>
-          <div class="export-form">
+    <main class="main">
+      <!-- New Entry Tab -->
+      <div class="tab-content active" id="tab-entry">
+        <div class="card">
+          <h2 class="card-title">Log Attendance</h2>
+          <form class="entry-form" id="entryForm">
             <div class="form-group">
-              <label class="form-label">From Date</label>
-              <input type="date" class="form-input" id="deleteFrom">
+              <label class="form-label">Agent Name <span class="required">*</span></label>
+              <input type="text" class="form-input" id="agentName" list="agentsList" required autocomplete="off">
+              <datalist id="agentsList"></datalist>
             </div>
             <div class="form-group">
-              <label class="form-label">To Date</label>
-              <input type="date" class="form-input" id="deleteTo">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Include</label>
-              <select class="form-select" id="deleteInclude">
-                <option value="all">All</option>
-                <option value="completed">Completed</option>
-                <option value="active">Active</option>
+              <label class="form-label">Team Lead <span class="required">*</span></label>
+              <select class="form-select" id="teamLead" required>
+                <option value="">Select Lead</option>
               </select>
             </div>
-            <button class="btn btn-danger" id="deleteEntriesBtn">
-              <span>🗑</span> Delete
-            </button>
-          </div>
-        </div>
-
-        <div class="admin-card full-width">
-          <h3 class="card-title">Export to Excel</h3>
-          <div class="export-form">
             <div class="form-group">
-              <label class="form-label">From Date</label>
-              <input type="date" class="form-input" id="exportFrom">
-            </div>
-            <div class="form-group">
-              <label class="form-label">To Date</label>
-              <input type="date" class="form-input" id="exportTo">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Include</label>
-              <select class="form-select" id="exportInclude">
-                <option value="all">All</option>
-                <option value="completed">Completed</option>
-                <option value="active">Active</option>
+              <label class="form-label">Work Status <span class="required">*</span></label>
+              <select class="form-select" id="workStatus" required>
+                <option value="">Select Status</option>
+                <option value="WIO">WIO</option>
+                <option value="WFH">WFH</option>
               </select>
             </div>
-            <button class="btn btn-success" id="exportBtn">
-              <span>📥</span> Download
+            <div class="form-group">
+              <label class="form-label">Location <span class="required">*</span></label>
+              <select class="form-select" id="location" required>
+                <option value="">Select Location</option>
+                <option value="Cebu">Cebu</option>
+                <option value="Manila">Manila</option>
+              </select>
+            </div>
+            <div class="form-group remarks">
+              <label class="form-label">Remarks</label>
+              <input type="text" class="form-input" id="remarks">
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span>⏱</span> Log In
             </button>
+          </form>
+          <div class="info-note" id="infoNote"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Today's Active Entries</h2>
+          <div class="table-container">
+            <table id="activeTable">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Team Lead</th><th>Log In</th><th>Log Out</th>
+                  <th>Elapsed</th><th>Status</th><th>Location</th><th>Remarks</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="activeTableBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="activeEmpty" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>No active entries today</p>
           </div>
         </div>
       </div>
-    </div>
-  </main>
 
-  <!-- Password Modal -->
+      <!-- Report Tab -->
+      <div class="tab-content" id="tab-report">
+        <div class="card">
+          <h2 class="card-title">Completed Entries</h2>
+          <div id="reportContent"></div>
+          <div class="empty-state" id="reportEmpty" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            <p>No completed entries yet</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tab -->
+      <div class="tab-content" id="tab-admin">
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h3 class="card-title">Manage Agents</h3>
+            <textarea id="agentsBulk" placeholder="Enter agent names (one per line)"></textarea>
+            <button class="btn btn-primary" id="addAgentsBtn">Add Agents</button>
+            <div class="tags-list" id="agentsTags"></div>
+          </div>
+          <div class="admin-card">
+            <h3 class="card-title">Manage Team Leads</h3>
+            <textarea id="leadsBulk" placeholder="Enter team lead names (one per line)"></textarea>
+            <button class="btn btn-primary" id="addLeadsBtn">Add Team Leads</button>
+            <div class="tags-list" id="leadsTags"></div>
+          </div>
+          <div class="admin-card full-width">
+            <h3 class="card-title">Delete Entries</h3>
+            <div class="export-form">
+              <div class="form-group">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-input" id="deleteFrom">
+              </div>
+              <div class="form-group">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-input" id="deleteTo">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Include</label>
+                <select class="form-select" id="deleteInclude">
+                  <option value="all">All</option>
+                  <option value="completed">Completed</option>
+                  <option value="active">Active</option>
+                </select>
+              </div>
+              <button class="btn btn-danger" id="deleteEntriesBtn"><span>🗑</span> Delete</button>
+            </div>
+          </div>
+          <div class="admin-card full-width">
+            <h3 class="card-title">Export to Excel</h3>
+            <div class="export-form">
+              <div class="form-group">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-input" id="exportFrom">
+              </div>
+              <div class="form-group">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-input" id="exportTo">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Include</label>
+                <select class="form-select" id="exportInclude">
+                  <option value="all">All</option>
+                  <option value="completed">Completed</option>
+                  <option value="active">Active</option>
+                </select>
+              </div>
+              <button class="btn btn-success" id="exportBtn"><span>📥</span> Download</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Password Modal (for Report/Admin tab) -->
   <div class="modal-overlay" id="passwordModal">
     <div class="modal">
       <h3 class="modal-title">🔒 Password Required</h3>
@@ -852,7 +925,7 @@
   <div class="modal-overlay" id="logoutModal">
     <div class="modal">
       <h3 class="modal-title">🚪 Log Out <span id="logoutAgentName"></span></h3>
-      <div class="form-group" style="margin-bottom: 1rem;">
+      <div class="form-group" style="margin-bottom:1rem;">
         <label class="form-label">Employee ID <span class="required">*</span></label>
         <input type="text" class="form-input" id="logoutEmpId" required placeholder="Enter Employee ID">
       </div>
@@ -883,11 +956,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-      databaseURL: "https://atcp-attendance-dale-default-rtdb.firebaseio.com"
-    };
-
+    // Firebase
+    const firebaseConfig = { databaseURL: "https://atcp-attendance-dale-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const dbRef = db.ref('atcp_attendance');
@@ -900,17 +970,105 @@
     let currentLogoutId = null;
     let pendingTab = null;
     let unlockedTabs = { report: false, admin: false };
+    let currentUser = null;
+    let pendingLoginId = null;
 
-    const PASSWORD = 'Pineapple';
+    const ADMIN_PASSWORD = 'Pineapple';
 
-    // DOM Elements
-    const liveDot = document.getElementById('liveDot');
-    const liveText = document.getElementById('liveText');
-    const navBtns = document.querySelectorAll('.nav-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    // ── LOGIN ──
+    function handleLogin() {
+      const loginId = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errorEl = document.getElementById('loginError');
+      errorEl.style.display = 'none';
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
+      if (!loginId) { showLoginError('Please enter your Login ID.'); return; }
+
+      // Admin login
+      if (loginId.toLowerCase() === 'admin') {
+        if (password === ADMIN_PASSWORD) {
+          currentUser = { id: 'Admin', isAdmin: true };
+          enterApp();
+          return;
+        } else {
+          showLoginError('Invalid Login ID or password.');
+          return;
+        }
+      }
+
+      // Agent login — check Firebase for stored password
+      dbRef.child('user_passwords').child(sanitizeKey(loginId)).once('value').then(snap => {
+        const stored = snap.val();
+        if (stored === null) {
+          // First time — prompt to create password
+          pendingLoginId = loginId;
+          document.getElementById('loginPage').style.display = 'none';
+          document.getElementById('setPasswordPage').classList.add('show');
+        } else if (stored === password) {
+          currentUser = { id: loginId, isAdmin: false };
+          enterApp();
+        } else {
+          showLoginError('Invalid Login ID or password.');
+        }
+      }).catch(() => {
+        showLoginError('Connection error. Please try again.');
+      });
+    }
+
+    function showLoginError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    document.getElementById('loginPassword').addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    // ── SET PASSWORD ──
+    function handleSetPassword() {
+      const newPw = document.getElementById('newPassword').value;
+      const confirmPw = document.getElementById('confirmPassword').value;
+      const errEl = document.getElementById('setPasswordError');
+      errEl.style.display = 'none';
+
+      if (newPw.length < 4) { errEl.textContent = 'Password must be at least 4 characters.'; errEl.style.display = 'block'; return; }
+      if (newPw !== confirmPw) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+      dbRef.child('user_passwords').child(sanitizeKey(pendingLoginId)).set(newPw).then(() => {
+        currentUser = { id: pendingLoginId, isAdmin: false };
+        document.getElementById('setPasswordPage').classList.remove('show');
+        enterApp();
+      }).catch(() => {
+        errEl.textContent = 'Error saving password. Please try again.';
+        errEl.style.display = 'block';
+      });
+    }
+
+    function sanitizeKey(str) {
+      return str.replace(/[.#$[\]]/g, '_');
+    }
+
+    function enterApp() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('setPasswordPage').classList.remove('show');
+      document.getElementById('appPage').classList.add('show');
+      document.getElementById('userChip').textContent = currentUser.id;
+      initApp();
+    }
+
+    function handleSignOut() {
+      currentUser = null;
+      unlockedTabs = { report: false, admin: false };
+      document.getElementById('appPage').classList.remove('show');
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('loginId').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').style.display = 'none';
+    }
+
+    // ── INIT APP ──
+    function initApp() {
       initFirebaseConnection();
       initNavigation();
       initEntryForm();
@@ -918,42 +1076,29 @@
       initModals();
       loadFromLocalStorage();
       syncFromFirebase();
-
-      // Auto-refresh elapsed times
       setInterval(updateElapsedTimes, 30000);
-
-      // Sync from Firebase every 15 seconds
       setInterval(syncFromFirebase, 15000);
-
-      // Set default export dates
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('exportFrom').value = today;
       document.getElementById('exportTo').value = today;
       document.getElementById('deleteFrom').value = today;
       document.getElementById('deleteTo').value = today;
-    });
-
-    // Firebase Connection Status
-    function initFirebaseConnection() {
-      db.ref('.info/connected').on('value', (snapshot) => {
-        isConnected = snapshot.val() === true;
-        updateConnectionStatus();
-      });
     }
 
-    function updateConnectionStatus() {
-      if (isConnected) {
-        liveDot.classList.remove('disconnected');
-        liveText.textContent = 'Live';
-      } else {
-        liveDot.classList.add('disconnected');
-        liveText.textContent = 'Offline';
-      }
+    // Firebase Connection
+    function initFirebaseConnection() {
+      db.ref('.info/connected').on('value', snap => {
+        isConnected = snap.val() === true;
+        const liveDot = document.getElementById('liveDot');
+        const liveText = document.getElementById('liveText');
+        if (isConnected) { liveDot.classList.remove('disconnected'); liveText.textContent = 'Live'; }
+        else { liveDot.classList.add('disconnected'); liveText.textContent = 'Offline'; }
+      });
     }
 
     // Navigation
     function initNavigation() {
-      navBtns.forEach(btn => {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const tab = btn.dataset.tab;
           if ((tab === 'report' || tab === 'admin') && !unlockedTabs[tab]) {
@@ -967,12 +1112,10 @@
     }
 
     function switchTab(tab) {
-      navBtns.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
       document.getElementById(`tab-${tab}`).classList.add('active');
-
       if (tab === 'report') renderReport();
       if (tab === 'admin') updateDeleteCount();
     }
@@ -981,17 +1124,11 @@
     function initEntryForm() {
       const form = document.getElementById('entryForm');
       const agentInput = document.getElementById('agentName');
-      const submitBtn = document.getElementById('submitBtn');
-
       agentInput.addEventListener('input', handleAgentInput);
-
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', e => {
         e.preventDefault();
-        if (submitBtn.classList.contains('btn-danger')) {
-          handleFormLogout();
-        } else {
-          handleLogIn();
-        }
+        if (document.getElementById('submitBtn').classList.contains('btn-danger')) handleFormLogout();
+        else handleLogIn();
       });
     }
 
@@ -1003,39 +1140,24 @@
       const submitBtn = document.getElementById('submitBtn');
       const infoNote = document.getElementById('infoNote');
 
-      // Find active entry for this agent
       const activeEntry = Object.values(entries).find(
         e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
       );
 
       if (activeEntry) {
-        // Auto-fill and lock fields
         teamLead.value = activeEntry.lead;
         workStatus.value = activeEntry.ws;
         location.value = activeEntry.loc;
-
-        teamLead.disabled = true;
-        workStatus.disabled = true;
-        location.disabled = true;
-
-        const logInTime = formatTime(activeEntry.logIn);
-        infoNote.innerHTML = `<strong>${activeEntry.agent}</strong> is already clocked in since <span class="mono">${logInTime}</span> — fields auto-filled.`;
+        teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
+        infoNote.innerHTML = `<strong>${activeEntry.agent}</strong> is already clocked in since <span class="mono">${formatTime(activeEntry.logIn)}</span> — fields auto-filled.`;
         infoNote.classList.add('visible');
-
         submitBtn.innerHTML = '<span>🚪</span> Log Out';
-        submitBtn.classList.remove('btn-primary');
-        submitBtn.classList.add('btn-danger');
+        submitBtn.classList.remove('btn-primary'); submitBtn.classList.add('btn-danger');
       } else {
-        // Unlock fields
-        teamLead.disabled = false;
-        workStatus.disabled = false;
-        location.disabled = false;
-
+        teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
         infoNote.classList.remove('visible');
-
         submitBtn.innerHTML = '<span>⏱</span> Log In';
-        submitBtn.classList.remove('btn-danger');
-        submitBtn.classList.add('btn-primary');
+        submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
       }
     }
 
@@ -1045,25 +1167,8 @@
       const workStatus = document.getElementById('workStatus').value;
       const location = document.getElementById('location').value;
       const remarks = document.getElementById('remarks').value.trim();
-
-      if (!agentName || !teamLead || !workStatus || !location) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-      }
-
-      const entry = {
-        id: generateId(),
-        agent: agentName,
-        lead: teamLead,
-        ws: workStatus,
-        loc: location,
-        remarks: remarks,
-        logIn: Date.now(),
-        logOut: null,
-        empId: null,
-        logOutRemarks: null
-      };
-
+      if (!agentName || !teamLead || !workStatus || !location) { showToast('Please fill in all required fields', 'error'); return; }
+      const entry = { id: generateId(), agent: agentName, lead: teamLead, ws: workStatus, loc: location, remarks, logIn: Date.now(), logOut: null, empId: null, logOutRemarks: null };
       saveEntry(entry);
       resetForm();
       showToast(`⏱ ${agentName} clocked in!`, 'success');
@@ -1072,11 +1177,7 @@
     function handleFormLogout() {
       const agentName = document.getElementById('agentName').value.trim();
       const remarks = document.getElementById('remarks').value.trim();
-
-      const activeEntry = Object.values(entries).find(
-        e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
-      );
-
+      const activeEntry = Object.values(entries).find(e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut);
       if (activeEntry) {
         activeEntry.logOut = Date.now();
         activeEntry.logOutRemarks = remarks || null;
@@ -1101,163 +1202,70 @@
     function renderActiveTable() {
       const tbody = document.getElementById('activeTableBody');
       const emptyState = document.getElementById('activeEmpty');
-
       const today = new Date().toDateString();
-      const activeEntries = Object.values(entries).filter(e => {
-        const entryDate = new Date(e.logIn).toDateString();
-        return !e.logOut && entryDate === today;
-      }).sort((a, b) => b.logIn - a.logIn);
-
-      if (activeEntries.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.style.display = 'block';
-        return;
-      }
-
+      const activeEntries = Object.values(entries).filter(e => !e.logOut && new Date(e.logIn).toDateString() === today).sort((a, b) => b.logIn - a.logIn);
+      if (activeEntries.length === 0) { tbody.innerHTML = ''; emptyState.style.display = 'block'; return; }
       emptyState.style.display = 'none';
-
       tbody.innerHTML = activeEntries.map(entry => {
         const elapsed = getElapsedTime(entry.logIn);
-        const hours = elapsed.hours + (elapsed.days * 24);
-        const totalHours = hours + (elapsed.minutes / 60);
-        const isOverdue = totalHours > 22;
-
+        const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
         let elapsedClass = 'elapsed-green';
         if (totalHours >= 8 && totalHours <= 22) elapsedClass = 'elapsed-amber';
         if (totalHours > 22) elapsedClass = 'elapsed-red';
-
-        return `
-          <tr class="${isOverdue ? 'overdue' : ''}">
-            <td><strong>${entry.agent}</strong></td>
-            <td>${entry.lead}</td>
-            <td class="mono">${formatTime(entry.logIn)}</td>
-            <td>—</td>
-            <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
-            <td>
-              ${isOverdue ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}
-            </td>
-            <td>${entry.loc}</td>
-            <td>${entry.remarks || '—'}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" onclick="openLogoutModal('${entry.id}', '${entry.agent}')">
-                Log Out
-              </button>
-            </td>
-          </tr>
-        `;
+        return `<tr class="${totalHours > 22 ? 'overdue' : ''}">
+          <td><strong>${entry.agent}</strong></td>
+          <td>${entry.lead}</td>
+          <td class="mono">${formatTime(entry.logIn)}</td>
+          <td>—</td>
+          <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
+          <td>${totalHours > 22 ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}</td>
+          <td>${entry.loc}</td>
+          <td>${entry.remarks || '—'}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="openLogoutModal('${entry.id}','${entry.agent}')">Log Out</button></td>
+        </tr>`;
       }).join('');
     }
 
-    function updateElapsedTimes() {
-      renderActiveTable();
-    }
+    function updateElapsedTimes() { renderActiveTable(); }
 
     // Report Tab
     function renderReport() {
       const content = document.getElementById('reportContent');
       const emptyState = document.getElementById('reportEmpty');
-
       const completedEntries = Object.values(entries).filter(e => e.logOut);
-
-      if (completedEntries.length === 0) {
-        content.innerHTML = '';
-        emptyState.style.display = 'block';
-        return;
-      }
-
+      if (completedEntries.length === 0) { content.innerHTML = ''; emptyState.style.display = 'block'; return; }
       emptyState.style.display = 'none';
-
-      // Group by month and day
       const grouped = {};
       completedEntries.forEach(entry => {
         const date = new Date(entry.logIn);
         const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
         const dayKey = date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
-
         if (!grouped[monthKey]) grouped[monthKey] = {};
         if (!grouped[monthKey][dayKey]) grouped[monthKey][dayKey] = [];
         grouped[monthKey][dayKey].push(entry);
       });
-
       let html = '';
       Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(month => {
-        html += `
-          <div class="month-group">
-            <div class="group-header" onclick="toggleGroup(this)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-              ${month} (${Object.values(grouped[month]).flat().length} entries)
-            </div>
-            <div class="group-content">
-        `;
-
+        html += `<div class="month-group"><div class="group-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${month} (${Object.values(grouped[month]).flat().length} entries)</div><div class="group-content">`;
         Object.keys(grouped[month]).forEach(day => {
           const dayEntries = grouped[month][day].sort((a, b) => b.logIn - a.logIn);
-          html += `
-            <div class="day-group">
-              <div class="day-header" onclick="toggleGroup(this)">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-                ${day} (${dayEntries.length} entries)
-              </div>
-              <div class="day-content">
-                <div class="table-container">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Team Lead</th>
-                        <th>Log In</th>
-                        <th>Log Out</th>
-                        <th>Elapsed</th>
-                        <th>Work Status</th>
-                        <th>Location</th>
-                        <th>Remarks</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${dayEntries.map(entry => {
-                        const elapsed = getElapsedTime(entry.logIn, entry.logOut);
-                        const hours = elapsed.hours + (elapsed.days * 24);
-                        const totalHours = hours + (elapsed.minutes / 60);
-
-                        let elapsedClass = 'elapsed-green';
-                        if (totalHours >= 8 && totalHours <= 22) elapsedClass = 'elapsed-amber';
-                        if (totalHours > 22) elapsedClass = 'elapsed-red';
-
-                        return `
-                          <tr>
-                            <td><strong>${entry.agent}</strong></td>
-                            <td>${entry.lead}</td>
-                            <td class="mono">${formatTime(entry.logIn)}</td>
-                            <td class="mono">${formatTime(entry.logOut)}</td>
-                            <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
-                            <td>${entry.ws}</td>
-                            <td>${entry.loc}</td>
-                            <td>${entry.remarks || '—'}</td>
-                          </tr>
-                        `;
-                      }).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          `;
+          html += `<div class="day-group"><div class="day-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${day} (${dayEntries.length} entries)</div><div class="day-content"><div class="table-container"><table><thead><tr><th>Name</th><th>Team Lead</th><th>Log In</th><th>Log Out</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th></tr></thead><tbody>${dayEntries.map(entry => {
+            const elapsed = getElapsedTime(entry.logIn, entry.logOut);
+            const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
+            let elapsedClass = 'elapsed-green';
+            if (totalHours >= 8 && totalHours <= 22) elapsedClass = 'elapsed-amber';
+            if (totalHours > 22) elapsedClass = 'elapsed-red';
+            return `<tr><td><strong>${entry.agent}</strong></td><td>${entry.lead}</td><td class="mono">${formatTime(entry.logIn)}</td><td class="mono">${formatTime(entry.logOut)}</td><td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td><td>${entry.ws}</td><td>${entry.loc}</td><td>${entry.remarks || '—'}</td></tr>`;
+          }).join('')}</tbody></table></div></div></div>`;
         });
-
         html += '</div></div>';
       });
-
       content.innerHTML = html;
     }
 
     function toggleGroup(header) {
       header.classList.toggle('expanded');
-      const content = header.nextElementSibling;
-      content.classList.toggle('expanded');
+      header.nextElementSibling.classList.toggle('expanded');
     }
 
     // Admin Panel
@@ -1271,94 +1279,57 @@
     function addAgents() {
       const textarea = document.getElementById('agentsBulk');
       const names = textarea.value.split('\n').map(n => n.trim()).filter(n => n);
-      if (names.length === 0) return;
-
-      const newAgents = [...new Set([...agents, ...names])];
-      agents = newAgents;
-      saveAgentsAndLeads();
-      textarea.value = '';
-      renderAgentsTags();
-      updateAgentsDatalist();
+      if (!names.length) return;
+      agents = [...new Set([...agents, ...names])];
+      saveAgentsAndLeads(); textarea.value = '';
+      renderAgentsTags(); updateAgentsDatalist();
       showToast(`Added ${names.length} agent(s)`, 'success');
     }
 
     function addLeads() {
       const textarea = document.getElementById('leadsBulk');
       const names = textarea.value.split('\n').map(n => n.trim()).filter(n => n);
-      if (names.length === 0) return;
-
-      const newLeads = [...new Set([...leads, ...names])];
-      leads = newLeads;
-      saveAgentsAndLeads();
-      textarea.value = '';
-      renderLeadsTags();
-      updateLeadsDropdown();
+      if (!names.length) return;
+      leads = [...new Set([...leads, ...names])];
+      saveAgentsAndLeads(); textarea.value = '';
+      renderLeadsTags(); updateLeadsDropdown();
       showToast(`Added ${names.length} team lead(s)`, 'success');
     }
 
-    function removeAgent(name) {
-      agents = agents.filter(a => a !== name);
-      saveAgentsAndLeads();
-      renderAgentsTags();
-      updateAgentsDatalist();
-    }
-
-    function removeLead(name) {
-      leads = leads.filter(l => l !== name);
-      saveAgentsAndLeads();
-      renderLeadsTags();
-      updateLeadsDropdown();
-    }
+    function removeAgent(name) { agents = agents.filter(a => a !== name); saveAgentsAndLeads(); renderAgentsTags(); updateAgentsDatalist(); }
+    function removeLead(name) { leads = leads.filter(l => l !== name); saveAgentsAndLeads(); renderLeadsTags(); updateLeadsDropdown(); }
 
     function renderAgentsTags() {
-      const container = document.getElementById('agentsTags');
-      container.innerHTML = agents.map(a => `
-        <span class="tag">
-          ${a}
-          <button class="tag-remove" onclick="removeAgent('${a}')">&times;</button>
-        </span>
-      `).join('');
+      document.getElementById('agentsTags').innerHTML = agents.map(a => `<span class="tag">${a}<button class="tag-remove" onclick="removeAgent('${a}')">&times;</button></span>`).join('');
     }
 
     function renderLeadsTags() {
-      const container = document.getElementById('leadsTags');
-      container.innerHTML = leads.map(l => `
-        <span class="tag">
-          ${l}
-          <button class="tag-remove" onclick="removeLead('${l}')">&times;</button>
-        </span>
-      `).join('');
+      document.getElementById('leadsTags').innerHTML = leads.map(l => `<span class="tag">${l}<button class="tag-remove" onclick="removeLead('${l}')">&times;</button></span>`).join('');
     }
 
     function updateAgentsDatalist() {
-      const datalist = document.getElementById('agentsList');
-      datalist.innerHTML = agents.map(a => `<option value="${a}">`).join('');
+      document.getElementById('agentsList').innerHTML = agents.map(a => `<option value="${a}">`).join('');
     }
 
     function updateLeadsDropdown() {
       const select = document.getElementById('teamLead');
-      const currentValue = select.value;
-      select.innerHTML = '<option value="">Select Lead</option>' +
-        leads.map(l => `<option value="${l}">${l}</option>`).join('');
-      if (leads.includes(currentValue)) select.value = currentValue;
+      const current = select.value;
+      select.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => `<option value="${l}">${l}</option>`).join('');
+      if (leads.includes(current)) select.value = current;
     }
+
+    function updateDeleteCount() {}
 
     function getDeleteFilteredEntries() {
       const fromDate = document.getElementById('deleteFrom').value;
       const toDate = document.getElementById('deleteTo').value;
       const include = document.getElementById('deleteInclude').value;
-
       if (!fromDate || !toDate) return [];
-
-      const fromTime = new Date(fromDate).setHours(0, 0, 0, 0);
-      const toTime = new Date(toDate).setHours(23, 59, 59, 999);
-
+      const fromTime = new Date(fromDate).setHours(0,0,0,0);
+      const toTime = new Date(toDate).setHours(23,59,59,999);
       return Object.values(entries).filter(e => {
-        const entryTime = new Date(e.logIn).getTime();
-        const inRange = entryTime >= fromTime && entryTime <= toTime;
-        
-        if (!inRange) return false;
-        
+        const t = new Date(e.logIn).getTime();
+        if (t < fromTime || t > toTime) return false;
         if (include === 'completed') return e.logOut !== null;
         if (include === 'active') return e.logOut === null;
         return true;
@@ -1367,31 +1338,18 @@
 
     function confirmDeleteEntries() {
       const count = getDeleteFilteredEntries().length;
-      if (count === 0) {
-        showToast('No entries to delete', 'info');
-        return;
-      }
-      const fromDate = document.getElementById('deleteFrom').value;
-      const toDate = document.getElementById('deleteTo').value;
+      if (count === 0) { showToast('No entries to delete', 'info'); return; }
+      const from = document.getElementById('deleteFrom').value;
+      const to = document.getElementById('deleteTo').value;
       const include = document.getElementById('deleteInclude').value;
-      const includeText = include === 'all' ? '' : ` (${include} only)`;
-      document.getElementById('confirmMessage').textContent =
-        `Are you sure you want to delete ${count} entries from ${fromDate} to ${toDate}${includeText}? This action cannot be undone.`;
+      document.getElementById('confirmMessage').textContent = `Are you sure you want to delete ${count} entries from ${from} to ${to} (${include})? This cannot be undone.`;
       document.getElementById('confirmModal').classList.add('active');
     }
 
     function deleteEntries() {
       const toDelete = getDeleteFilteredEntries();
-
-      toDelete.forEach(e => {
-        delete entries[e.id];
-        dbRef.child('entries').child(e.id).remove();
-      });
-
-      saveToLocalStorage();
-      renderActiveTable();
-      renderReport();
-      updateDeleteCount();
+      toDelete.forEach(e => { delete entries[e.id]; dbRef.child('entries').child(e.id).remove(); });
+      saveToLocalStorage(); renderActiveTable(); renderReport();
       document.getElementById('confirmModal').classList.remove('active');
       showToast(`Deleted ${toDelete.length} entries`, 'success');
     }
@@ -1399,96 +1357,57 @@
     function exportToExcel() {
       const fromDate = new Date(document.getElementById('exportFrom').value);
       const toDate = new Date(document.getElementById('exportTo').value);
-      toDate.setHours(23, 59, 59, 999);
+      toDate.setHours(23,59,59,999);
       const include = document.getElementById('exportInclude').value;
-
       let filtered = Object.values(entries).filter(e => {
-        const entryDate = new Date(e.logIn);
-        if (entryDate < fromDate || entryDate > toDate) return false;
+        const d = new Date(e.logIn);
+        if (d < fromDate || d > toDate) return false;
         if (include === 'completed') return e.logOut;
         if (include === 'active') return !e.logOut;
         return true;
       });
-
-      if (filtered.length === 0) {
-        showToast('No entries to export', 'info');
-        return;
-      }
-
+      if (!filtered.length) { showToast('No entries to export', 'info'); return; }
       const data = filtered.map(e => {
         const elapsed = e.logOut ? getElapsedTime(e.logIn, e.logOut) : getElapsedTime(e.logIn);
-        return {
-          'Date': new Date(e.logIn).toLocaleDateString(),
-          'Agent Name': e.agent,
-          'Employee ID': e.empId || '',
-          'Team Lead': e.lead,
-          'Work Status': e.ws,
-          'Location': e.loc,
-          'Log In': formatDateTime(e.logIn),
-          'Log Out': e.logOut ? formatDateTime(e.logOut) : '',
-          'Elapsed': formatElapsed(elapsed),
-          'Status': e.logOut ? 'Completed' : 'Active',
-          'Log-In Remarks': e.remarks || '',
-          'Log-Out Remarks': e.logOutRemarks || ''
-        };
+        return { 'Date': new Date(e.logIn).toLocaleDateString(), 'Agent Name': e.agent, 'Employee ID': e.empId || '', 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc, 'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '', 'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active', 'Log-In Remarks': e.remarks || '', 'Log-Out Remarks': e.logOutRemarks || '' };
       });
-
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
-
-      const fileName = `attendance_${document.getElementById('exportFrom').value}_to_${document.getElementById('exportTo').value}.xlsx`;
-      XLSX.writeFile(wb, fileName);
+      XLSX.writeFile(wb, `attendance_${document.getElementById('exportFrom').value}_to_${document.getElementById('exportTo').value}.xlsx`);
       showToast('Excel file downloaded!', 'success');
     }
 
     // Modals
     function initModals() {
-      // Password Modal
       document.getElementById('passwordCancel').addEventListener('click', () => {
         document.getElementById('passwordModal').classList.remove('active');
         document.getElementById('passwordInput').value = '';
         pendingTab = null;
       });
-
       document.getElementById('passwordSubmit').addEventListener('click', submitPassword);
-      document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitPassword();
-      });
-
-      // Logout Modal
-      document.getElementById('logoutCancel').addEventListener('click', () => {
-        document.getElementById('logoutModal').classList.remove('active');
-        currentLogoutId = null;
-      });
-
+      document.getElementById('passwordInput').addEventListener('keypress', e => { if (e.key === 'Enter') submitPassword(); });
+      document.getElementById('logoutCancel').addEventListener('click', () => { document.getElementById('logoutModal').classList.remove('active'); currentLogoutId = null; });
       document.getElementById('logoutSubmit').addEventListener('click', submitLogout);
-
-      // Confirm Modal
-      document.getElementById('confirmCancel').addEventListener('click', () => {
-        document.getElementById('confirmModal').classList.remove('active');
-      });
-
+      document.getElementById('confirmCancel').addEventListener('click', () => { document.getElementById('confirmModal').classList.remove('active'); });
       document.getElementById('confirmDelete').addEventListener('click', deleteEntries);
     }
 
     function openPasswordModal() {
       document.getElementById('passwordModal').classList.add('active');
-      document.getElementById('passwordInput').focus();
+      setTimeout(() => document.getElementById('passwordInput').focus(), 100);
     }
 
     function submitPassword() {
       const input = document.getElementById('passwordInput');
-      if (input.value === PASSWORD) {
+      if (input.value === ADMIN_PASSWORD) {
         unlockedTabs[pendingTab] = true;
         switchTab(pendingTab);
         document.getElementById('passwordModal').classList.remove('active');
-        input.value = '';
-        pendingTab = null;
+        input.value = ''; pendingTab = null;
       } else {
         showToast('Incorrect password', 'error');
-        input.value = '';
-        input.focus();
+        input.value = ''; input.focus();
       }
     }
 
@@ -1498,18 +1417,13 @@
       document.getElementById('logoutEmpId').value = '';
       document.getElementById('logoutRemarks').value = '';
       document.getElementById('logoutModal').classList.add('active');
-      document.getElementById('logoutEmpId').focus();
+      setTimeout(() => document.getElementById('logoutEmpId').focus(), 100);
     }
 
     function submitLogout() {
       const empId = document.getElementById('logoutEmpId').value.trim();
       const remarks = document.getElementById('logoutRemarks').value.trim();
-
-      if (!empId) {
-        showToast('Employee ID is required', 'error');
-        return;
-      }
-
+      if (!empId) { showToast('Employee ID is required', 'error'); return; }
       const entry = entries[currentLogoutId];
       if (entry) {
         entry.logOut = Date.now();
@@ -1518,17 +1432,15 @@
         saveEntry(entry);
         showToast(`👋 ${entry.agent} clocked out at ${formatTime(entry.logOut)}!`, 'success');
       }
-
       document.getElementById('logoutModal').classList.remove('active');
       currentLogoutId = null;
     }
 
-    // Data Management
+    // Data
     function saveEntry(entry) {
       entries[entry.id] = entry;
       dbRef.child('entries').child(entry.id).set(entry);
-      saveToLocalStorage();
-      renderActiveTable();
+      saveToLocalStorage(); renderActiveTable();
     }
 
     function saveAgentsAndLeads() {
@@ -1544,19 +1456,13 @@
     }
 
     function loadFromLocalStorage() {
-      const savedEntries = localStorage.getItem('attendance_entries');
-      const savedAgents = localStorage.getItem('attendance_agents');
-      const savedLeads = localStorage.getItem('attendance_leads');
-
-      if (savedEntries) entries = JSON.parse(savedEntries);
-      if (savedAgents) agents = JSON.parse(savedAgents);
-      if (savedLeads) leads = JSON.parse(savedLeads);
-
-      renderActiveTable();
-      renderAgentsTags();
-      renderLeadsTags();
-      updateAgentsDatalist();
-      updateLeadsDropdown();
+      const e = localStorage.getItem('attendance_entries');
+      const a = localStorage.getItem('attendance_agents');
+      const l = localStorage.getItem('attendance_leads');
+      if (e) entries = JSON.parse(e);
+      if (a) agents = JSON.parse(a);
+      if (l) leads = JSON.parse(l);
+      renderActiveTable(); renderAgentsTags(); renderLeadsTags(); updateAgentsDatalist(); updateLeadsDropdown();
     }
 
     function syncFromFirebase() {
@@ -1566,58 +1472,31 @@
           if (data.entries) entries = data.entries;
           if (data.agents) agents = data.agents;
           if (data.leads) leads = data.leads;
-
-          saveToLocalStorage();
-          renderActiveTable();
-          renderAgentsTags();
-          renderLeadsTags();
-          updateAgentsDatalist();
-          updateLeadsDropdown();
+          saveToLocalStorage(); renderActiveTable(); renderAgentsTags(); renderLeadsTags(); updateAgentsDatalist(); updateLeadsDropdown();
         }
-      }).catch(err => {
-        console.error('Firebase sync error:', err);
-      });
+      }).catch(err => console.error('Firebase sync error:', err));
     }
 
-    // Utility Functions
-    function generateId() {
-      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    // Utils
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+    function formatTime(ts) {
+      if (!ts) return '—';
+      return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
-    function formatTime(timestamp) {
-      if (!timestamp) return '—';
-      return new Date(timestamp).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    }
-
-    function formatDateTime(timestamp) {
-      if (!timestamp) return '—';
-      return new Date(timestamp).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+    function formatDateTime(ts) {
+      if (!ts) return '—';
+      return new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
     function getElapsedTime(start, end = Date.now()) {
       const diff = end - start;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return { days, hours, minutes };
+      return { days: Math.floor(diff / 86400000), hours: Math.floor((diff % 86400000) / 3600000), minutes: Math.floor((diff % 3600000) / 60000) };
     }
 
-    function formatElapsed(elapsed) {
-      if (elapsed.days > 0) {
-        return `${elapsed.days}d ${elapsed.hours}h ${elapsed.minutes}m`;
-      }
-      return `${elapsed.hours}h ${elapsed.minutes}m`;
+    function formatElapsed(e) {
+      return e.days > 0 ? `${e.days}d ${e.hours}h ${e.minutes}m` : `${e.hours}h ${e.minutes}m`;
     }
 
     function showToast(message, type = 'info') {
@@ -1626,12 +1505,7 @@
       toast.className = `toast ${type}`;
       toast.textContent = message;
       container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
   </script>
 </body>
