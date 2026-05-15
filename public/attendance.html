@@ -15,63 +15,36 @@
     body { font-family: 'DM Sans', sans-serif; background: #f4f6f9; min-height: 100vh; color: #1f2937; }
     .mono { font-family: 'DM Mono', monospace; }
 
-    /* ── LOGIN PAGE ── */
-    #loginPage {
-      display: flex; min-height: 100vh; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%); padding: 1rem;
-    }
-    .login-card {
-      background: white; border-radius: 24px; padding: 2.5rem 2rem;
-      width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-    }
+    #loginPage { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%); padding: 1rem; }
+    .login-card { background: white; border-radius: 24px; padding: 2.5rem 2rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
     .track-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; }
     .track-logo-icon { position: relative; width: 48px; height: 48px; }
-    .track-logo-icon svg.clock { width: 48px; height: 48px; }
-    .check-badge {
-      position: absolute; bottom: -2px; right: -4px; width: 20px; height: 20px;
-      background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;
-    }
-    .track-logo-text {
-      font-size: 2rem; font-weight: 800;
-      background: linear-gradient(135deg, #1a6fc4, #0ea5a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
+    .track-logo-icon svg { width: 48px; height: 48px; }
+    .check-badge { position: absolute; bottom: -2px; right: -4px; width: 20px; height: 20px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+    .track-logo-text { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #1a6fc4, #0ea5a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .login-subtitle { text-align: center; color: #6b7280; font-size: 0.9rem; margin-bottom: 2rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
     .login-form .form-group { margin-bottom: 1rem; }
     .login-form label { display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.4rem; }
-    .login-input {
-      width: 100%; padding: 0.85rem 1rem; border: 1.5px solid #e5e7eb; border-radius: 12px;
-      font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; background: #f9fafb;
-    }
+    .login-input { width: 100%; padding: 0.85rem 1rem; border: 1.5px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; background: #f9fafb; }
     .login-input:focus { outline: none; border-color: #1a6fc4; box-shadow: 0 0 0 3px rgba(26,111,196,0.1); background: white; }
-    .login-btn {
-      width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #1a6fc4, #0ea5a0);
-      color: white; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem;
-      font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s, transform 0.1s;
-    }
+    .login-btn { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #1a6fc4, #0ea5a0); color: white; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s, transform 0.1s; }
     .login-btn:hover { opacity: 0.9; }
     .login-btn:active { transform: scale(0.98); }
     .login-error { color: #ef4444; font-size: 0.85rem; text-align: center; margin-top: 0.75rem; display: none; }
     .login-footer { text-align: center; color: #9ca3af; font-size: 0.8rem; margin-top: 1.5rem; }
 
-    /* ── SET PASSWORD PAGE ── */
     #setPasswordPage { display: none; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%); padding: 1rem; }
     #setPasswordPage.show { display: flex; }
-
-    /* ── MAIN APP ── */
     #appPage { display: none; }
     #appPage.show { display: block; }
 
-    /* Header */
     .header { background: white; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-logo { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: opacity 0.2s; }
     .header-logo:hover { opacity: 0.8; }
     .header-logo-icon { position: relative; width: 32px; height: 32px; }
     .header-logo-icon svg { width: 32px; height: 32px; }
-    .check-badge-sm {
-      position: absolute; bottom: -1px; right: -3px; width: 13px; height: 13px;
-      background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid white;
-    }
+    .check-badge-sm { position: absolute; bottom: -1px; right: -3px; width: 13px; height: 13px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid white; }
     .header-logo-text { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #1a6fc4, #0ea5a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .header-right { display: flex; align-items: center; gap: 1.5rem; }
     .user-chip { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; background: linear-gradient(135deg, #1a6fc4, #0ea5a0); color: white; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
@@ -87,16 +60,11 @@
     .live-dot.disconnected { background: #ef4444; animation: none; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 
-    /* Main */
     .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    /* Cards */
     .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
-
-    /* Form */
     .entry-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
     .form-group { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; min-width: 150px; }
     .form-group.remarks { flex: 2; }
@@ -112,13 +80,14 @@
     .btn-danger:hover { background: #dc2626; }
     .btn-success { background: #16a34a; color: white; }
     .btn-success:hover { background: #15803d; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
     .btn-outline { background: white; border: 1px solid #e5e7eb; color: #4b5563; }
     .btn-outline:hover { background: #f9fafb; }
     .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
     .info-note { display: none; padding: 0.75rem 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af; font-size: 0.9rem; margin-top: 1rem; }
     .info-note.visible { display: block; }
 
-    /* Tables */
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
@@ -133,7 +102,6 @@
     .elapsed-amber { color: #d97706; }
     .elapsed-red { color: #ef4444; }
 
-    /* Report */
     .month-group { margin-bottom: 1rem; }
     .group-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f9fafb; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
     .group-header:hover { background: #f3f4f6; }
@@ -149,28 +117,24 @@
     .day-content { display: none; margin-top: 0.5rem; }
     .day-content.expanded { display: block; }
 
-    /* Admin grid inside settings */
+    .export-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
+
     .settings-admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
     .settings-admin-card { background: #f9fafb; border-radius: 12px; padding: 1.25rem; border: 1px solid #e5e7eb; }
     .settings-admin-card textarea { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 0.9rem; resize: vertical; min-height: 80px; margin-bottom: 0.75rem; background: white; }
-    .settings-admin-card textarea:focus { outline: none; border-color: #1a6fc4; box-shadow: 0 0 0 3px rgba(26,111,196,0.1); }
+    .settings-admin-card textarea:focus { outline: none; border-color: #1a6fc4; }
     .tags-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
     .tag { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; background: white; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.85rem; }
     .tag-remove { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; transition: color 0.2s; }
     .tag-remove:hover { color: #ef4444; }
 
-    /* Password list */
     .pw-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .pw-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; }
-    .pw-item-id { font-weight: 600; flex: 1; font-size: 0.9rem; }
-    .pw-item-pw { font-family: 'DM Mono', monospace; color: #6b7280; font-size: 0.85rem; flex: 1; }
-    .pw-item-input { flex: 1; padding: 0.4rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.85rem; }
+    .pw-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; flex-wrap: wrap; }
+    .pw-item-id { font-weight: 600; flex: 1; font-size: 0.9rem; min-width: 120px; }
+    .pw-item-pw { font-family: 'DM Mono', monospace; color: #6b7280; font-size: 0.85rem; min-width: 80px; }
+    .pw-item-input { flex: 1; padding: 0.4rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.85rem; min-width: 140px; }
     .pw-item-input:focus { outline: none; border-color: #1a6fc4; }
 
-    /* Export/Delete in report */
-    .export-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
-
-    /* Modal */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
     .modal { background: white; border-radius: 16px; padding: 2rem; width: 100%; max-width: 420px; }
@@ -178,7 +142,6 @@
     .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
     .modal-actions .btn { flex: 1; }
 
-    /* Settings Modal */
     .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
     .settings-overlay.active { display: flex; }
     .settings-modal { background: white; border-radius: 20px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
@@ -199,7 +162,6 @@
     .settings-back:hover { text-decoration: underline; }
     .section-title { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
 
-    /* Toast */
     .toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; }
     .toast { padding: 1rem 1.5rem; border-radius: 10px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
     .toast.success { background: #166534; }
@@ -209,8 +171,6 @@
     .empty-state { text-align: center; padding: 3rem; color: #9ca3af; }
     .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5; }
 
-    .divider { height: 1px; background: #e5e7eb; margin: 1.5rem 0; }
-
     @media (max-width: 768px) {
       .header { padding: 1rem; }
       .header-content { flex-direction: column; gap: 1rem; }
@@ -218,17 +178,18 @@
       .entry-form { flex-direction: column; }
       .form-group { width: 100%; }
       .settings-menu { grid-template-columns: 1fr; }
+      .pw-item { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── LOGIN PAGE ── -->
+<!-- LOGIN PAGE -->
 <div id="loginPage">
   <div class="login-card">
     <div class="track-logo">
       <div class="track-logo-icon">
-        <svg class="clock" viewBox="0 0 48 48" fill="none">
+        <svg viewBox="0 0 48 48" fill="none">
           <circle cx="24" cy="24" r="22" stroke="url(#lg1)" stroke-width="3" fill="none"/>
           <line x1="24" y1="10" x2="24" y2="12" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round"/>
           <line x1="24" y1="36" x2="24" y2="38" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round"/>
@@ -251,7 +212,7 @@
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" class="login-input" id="loginPassword" placeholder="Enter password">
+        <input type="password" class="login-input" id="loginPassword" placeholder="Enter password" maxlength="20">
       </div>
       <p class="login-error" id="loginError">Invalid Agent ID or password.</p>
       <button class="login-btn" onclick="handleLogin()">Sign In</button>
@@ -260,12 +221,12 @@
   </div>
 </div>
 
-<!-- ── SET PASSWORD PAGE ── -->
+<!-- SET PASSWORD PAGE -->
 <div id="setPasswordPage">
   <div class="login-card">
     <div class="track-logo">
       <div class="track-logo-icon">
-        <svg class="clock" viewBox="0 0 48 48" fill="none">
+        <svg viewBox="0 0 48 48" fill="none">
           <circle cx="24" cy="24" r="22" stroke="url(#lg2)" stroke-width="3" fill="none"/>
           <line x1="24" y1="10" x2="24" y2="12" stroke="url(#lg2)" stroke-width="2.5" stroke-linecap="round"/>
           <line x1="24" y1="36" x2="24" y2="38" stroke="url(#lg2)" stroke-width="2.5" stroke-linecap="round"/>
@@ -285,11 +246,11 @@
     <div class="login-form">
       <div class="form-group">
         <label>New Password <span style="color:#ef4444">*</span></label>
-        <input type="password" class="login-input" id="newPassword" placeholder="Min 4 characters">
+        <input type="password" class="login-input" id="newPassword" placeholder="4–20 characters" maxlength="20">
       </div>
       <div class="form-group">
         <label>Confirm Password <span style="color:#ef4444">*</span></label>
-        <input type="password" class="login-input" id="confirmPassword" placeholder="Repeat password">
+        <input type="password" class="login-input" id="confirmPassword" placeholder="Repeat password" maxlength="20">
       </div>
       <p class="login-error" id="setPasswordError"></p>
       <button class="login-btn" onclick="handleSetPassword()">Create Password & Sign In</button>
@@ -297,7 +258,7 @@
   </div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- MAIN APP -->
 <div id="appPage">
   <header class="header">
     <div class="header-content">
@@ -382,7 +343,7 @@
             <thead>
               <tr>
                 <th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th>
-                <th>Status</th><th>Location</th><th>Remarks</th><th>Action</th>
+                <th>Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th>
               </tr>
             </thead>
             <tbody id="activeTableBody"></tbody>
@@ -405,8 +366,6 @@
           <p>No completed entries yet</p>
         </div>
       </div>
-
-      <!-- Delete & Export — admin only -->
       <div id="reportAdminTools" style="display:none;">
         <div class="card">
           <h2 class="card-title">🗑 Delete Entries</h2>
@@ -414,9 +373,7 @@
             <div class="form-group"><label class="form-label">From Date</label><input type="date" class="form-input" id="deleteFrom"></div>
             <div class="form-group"><label class="form-label">To Date</label><input type="date" class="form-input" id="deleteTo"></div>
             <div class="form-group"><label class="form-label">Include</label>
-              <select class="form-select" id="deleteInclude">
-                <option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option>
-              </select>
+              <select class="form-select" id="deleteInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select>
             </div>
             <button class="btn btn-danger" onclick="confirmDeleteEntries()"><span>🗑</span> Delete</button>
           </div>
@@ -427,9 +384,7 @@
             <div class="form-group"><label class="form-label">From Date</label><input type="date" class="form-input" id="exportFrom"></div>
             <div class="form-group"><label class="form-label">To Date</label><input type="date" class="form-input" id="exportTo"></div>
             <div class="form-group"><label class="form-label">Include</label>
-              <select class="form-select" id="exportInclude">
-                <option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option>
-              </select>
+              <select class="form-select" id="exportInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select>
             </div>
             <button class="btn btn-success" onclick="exportToExcel()"><span>📥</span> Download</button>
           </div>
@@ -439,15 +394,14 @@
   </main>
 </div>
 
-<!-- ── SETTINGS MODAL ── -->
+<!-- SETTINGS MODAL -->
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-modal">
     <div class="settings-header">
       <div class="settings-title">⚙️ Settings</div>
       <button class="settings-close" onclick="closeSettings()">×</button>
     </div>
-    <div class="settings-body" id="settingsBody">
-      <!-- lock screen -->
+    <div class="settings-body">
       <div id="settingsLock">
         <div class="settings-lock">
           <div class="settings-lock-icon">🔒</div>
@@ -460,22 +414,16 @@
           </div>
         </div>
       </div>
-      <!-- menu -->
       <div id="settingsMenu" style="display:none;">
         <div class="settings-menu">
           <button class="settings-menu-btn" onclick="showSettingsView('admin')">
-            <div class="icon">⚙️</div>
-            <div class="label">Admin Panel</div>
-            <div class="sublabel">Manage agents & leads</div>
+            <div class="icon">⚙️</div><div class="label">Admin Panel</div><div class="sublabel">Manage agents & leads</div>
           </button>
           <button class="settings-menu-btn" onclick="showSettingsView('passwords')">
-            <div class="icon">🔑</div>
-            <div class="label">Passwords</div>
-            <div class="sublabel">Manage all passwords</div>
+            <div class="icon">🔑</div><div class="label">Passwords</div><div class="sublabel">Manage all passwords</div>
           </button>
         </div>
       </div>
-      <!-- admin panel view -->
       <div id="settingsAdminView" style="display:none;">
         <button class="settings-back" onclick="showSettingsView('menu')">← Back</button>
         <div class="settings-admin-grid">
@@ -493,13 +441,12 @@
           </div>
         </div>
       </div>
-      <!-- passwords view -->
       <div id="settingsPasswordsView" style="display:none;">
         <button class="settings-back" onclick="showSettingsView('menu')">← Back</button>
         <div class="section-title">Main Login Password (Admin)</div>
-        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;align-items:center;">
-          <input type="password" class="form-input" id="newAdminPwInput" placeholder="New admin password" style="flex:1;">
-          <input type="password" class="form-input" id="newAdminPwConfirm" placeholder="Confirm password" style="flex:1;">
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap;">
+          <input type="password" class="form-input" id="newAdminPwInput" placeholder="New admin password" maxlength="20" style="flex:1;min-width:150px;">
+          <input type="password" class="form-input" id="newAdminPwConfirm" placeholder="Confirm password" maxlength="20" style="flex:1;min-width:150px;">
           <button class="btn btn-primary btn-sm" onclick="changeAdminPassword()">Save</button>
         </div>
         <div class="section-title">Agent Passwords</div>
@@ -532,7 +479,7 @@
 <div class="modal-overlay" id="logoutModal">
   <div class="modal">
     <h3 class="modal-title">🚪 Log Out — <span id="logoutAgentName"></span></h3>
-    <div class="form-group" style="margin-bottom:1rem;">
+    <div class="form-group">
       <label class="form-label">Remarks (optional)</label>
       <input type="text" class="form-input" id="logoutRemarks" placeholder="Optional remarks">
     </div>
@@ -574,17 +521,11 @@
   let ADMIN_PASSWORD = 'Pineapple';
   const SETTINGS_PASSWORD = 'Glendale';
 
-  // ── CLOCK SVG helper ──
-  function clockSVG(id) {
-    return `<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="url(#${id})" stroke-width="3" fill="none"/><line x1="24" y1="10" x2="24" y2="12" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><line x1="24" y1="36" x2="24" y2="38" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><line x1="10" y1="24" x2="12" y2="24" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><line x1="36" y1="24" x2="38" y2="24" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><line x1="24" y1="24" x2="24" y2="14" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><line x1="24" y1="24" x2="32" y2="28" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="24" r="2" fill="url(#${id})"/><defs><linearGradient id="${id}" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#1a6fc4"/><stop offset="100%" stop-color="#0ea5a0"/></linearGradient></defs></svg>`;
-  }
-
-  // ── LOGIN ──
+  // LOGIN
   function handleLogin() {
     const loginId = document.getElementById('loginId').value.trim();
     const password = document.getElementById('loginPassword').value;
-    const errorEl = document.getElementById('loginError');
-    errorEl.style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
     if (loginId.toLowerCase() === 'admin') {
       if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; enterApp(); }
@@ -605,7 +546,6 @@
   }
 
   function showLoginError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
-
   document.getElementById('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
 
   function handleSetPassword() {
@@ -613,7 +553,7 @@
     const confirmPw = document.getElementById('confirmPassword').value;
     const errEl = document.getElementById('setPasswordError');
     errEl.style.display = 'none';
-    if (newPw.length < 4) { errEl.textContent = 'Min 4 characters.'; errEl.style.display = 'block'; return; }
+    if (newPw.length < 4 || newPw.length > 20) { errEl.textContent = 'Password must be 4–20 characters.'; errEl.style.display = 'block'; return; }
     if (newPw !== confirmPw) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
     dbRef.child('user_passwords').child(sanitizeKey(pendingLoginId)).set(newPw).then(() => {
       currentUser = { id: pendingLoginId, isAdmin: false };
@@ -630,6 +570,8 @@
     document.getElementById('appPage').classList.add('show');
     document.getElementById('userChip').textContent = currentUser.id;
     if (currentUser.isAdmin) document.getElementById('reportAdminTools').style.display = 'block';
+    // Hide action column header for agents
+    if (!currentUser.isAdmin) document.getElementById('actionHeader').style.display = 'none';
     initApp();
   }
 
@@ -640,9 +582,10 @@
     document.getElementById('loginId').value = '';
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginError').style.display = 'none';
+    document.getElementById('reportAdminTools').style.display = 'none';
   }
 
-  // ── INIT APP ──
+  // INIT APP
   function initApp() {
     initFirebaseConnection();
     initNavigation();
@@ -678,7 +621,6 @@
 
   function initEntryForm() {
     const agentInput = document.getElementById('agentName');
-    // If agent (not admin), lock agent field to their own ID
     if (currentUser && !currentUser.isAdmin) {
       agentInput.value = currentUser.id;
       agentInput.disabled = true;
@@ -689,6 +631,8 @@
       if (document.getElementById('submitBtn').classList.contains('btn-danger')) handleFormLogout();
       else handleLogIn();
     });
+    // Trigger check in case agent already has active entry
+    if (currentUser && !currentUser.isAdmin) setTimeout(handleAgentInput, 500);
   }
 
   function handleAgentInput() {
@@ -728,7 +672,6 @@
     const agentName = document.getElementById('agentName').value.trim();
     const activeEntry = Object.values(entries).find(e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut);
     if (activeEntry) {
-      // Self logout — just confirm with optional remarks
       selfLogoutId = activeEntry.id;
       document.getElementById('logoutAgentName').textContent = agentName;
       document.getElementById('logoutRemarks').value = '';
@@ -761,13 +704,12 @@
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
   }
 
-  // ── ACTIVE TABLE ──
+  // ACTIVE TABLE
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
     const today = new Date().toDateString();
     let activeEntries = Object.values(entries).filter(e => !e.logOut && new Date(e.logIn).toDateString() === today);
-    // Filter by current user if not admin
     if (currentUser && !currentUser.isAdmin) {
       activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
     }
@@ -779,12 +721,10 @@
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       let elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
-      const canLogout = currentUser.isAdmin || (entry.agent && entry.agent.toLowerCase() === currentUser.id.toLowerCase());
-      const logoutBtn = canLogout
-        ? (currentUser.isAdmin && !(entry.agent && entry.agent.toLowerCase() === currentUser.id.toLowerCase())
-            ? `<button class="btn btn-danger btn-sm" onclick="openForceLogout('${entry.id}','${entry.agent}')">Force Log Out</button>`
-            : `<button class="btn btn-danger btn-sm" onclick="openSelfLogoutById('${entry.id}','${entry.agent}')">Log Out</button>`)
-        : '—';
+      // Only admin sees Force Log Out button; agents see no action button
+      const actionBtn = currentUser.isAdmin
+        ? `<button class="btn btn-danger btn-sm" onclick="openForceLogout('${entry.id}','${entry.agent}')">Force Log Out</button>`
+        : '';
       return `<tr class="${isOverdue ? 'overdue' : ''}">
         <td><strong>${entry.agent}</strong></td>
         <td>${entry.lead}</td>
@@ -793,7 +733,7 @@
         <td>${isOverdue ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}</td>
         <td>${entry.loc}</td>
         <td>${entry.remarks || '—'}</td>
-        <td>${logoutBtn}</td>
+        <td>${actionBtn}</td>
       </tr>`;
     }).join('');
   }
@@ -823,14 +763,7 @@
     closeForceLogout();
   }
 
-  function openSelfLogoutById(id, name) {
-    selfLogoutId = id;
-    document.getElementById('logoutAgentName').textContent = name;
-    document.getElementById('logoutRemarks').value = '';
-    document.getElementById('logoutModal').classList.add('active');
-  }
-
-  // ── REPORT ──
+  // REPORT
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
@@ -868,7 +801,7 @@
 
   function toggleGroup(header) { header.classList.toggle('expanded'); header.nextElementSibling.classList.toggle('expanded'); }
 
-  // ── SETTINGS ──
+  // SETTINGS
   function openSettings() {
     settingsUnlocked = false;
     document.getElementById('settingsLock').style.display = 'block';
@@ -905,7 +838,7 @@
     if (view === 'passwords') { document.getElementById('settingsPasswordsView').style.display = 'block'; renderAgentPasswordsList(); }
   }
 
-  // ── AGENTS & LEADS ──
+  // AGENTS & LEADS
   function addAgents() {
     const names = document.getElementById('agentsBulk').value.split('\n').map(n => n.trim()).filter(n => n);
     if (!names.length) return;
@@ -946,19 +879,20 @@
     if (leads.includes(cur)) select.value = cur;
   }
 
-  // ── PASSWORDS ──
+  // PASSWORDS
   function renderAgentPasswordsList() {
     const container = document.getElementById('agentPasswordsList');
     if (!agents.length) { container.innerHTML = '<p style="color:#9ca3af;font-size:0.9rem;">No agents added yet.</p>'; return; }
     Promise.all(agents.map(agentId =>
-      dbRef.child('user_passwords').child(sanitizeKey(agentId)).once('value').then(snap => ({ id: agentId, pw: snap.val() || '(not set)' }))
+      dbRef.child('user_passwords').child(sanitizeKey(agentId)).once('value').then(snap => ({ id: agentId, pw: snap.val() }))
     )).then(results => {
       container.innerHTML = results.map(r => `
         <div class="pw-item">
           <div class="pw-item-id">${r.id}</div>
-          <div class="pw-item-pw">${r.pw === '(not set)' ? '<em style="color:#9ca3af">(not set)</em>' : '••••••'}</div>
-          <input type="password" class="pw-item-input" id="pw_${sanitizeKey(r.id)}" placeholder="New password">
+          <div class="pw-item-pw">${r.pw === null ? '<em style="color:#9ca3af">(not set)</em>' : '••••••'}</div>
+          <input type="password" class="pw-item-input" id="pw_${sanitizeKey(r.id)}" placeholder="New password" maxlength="20">
           <button class="btn btn-primary btn-sm" onclick="changeAgentPassword('${r.id}')">Save</button>
+          <button class="btn btn-warning btn-sm" onclick="resetAgentPassword('${r.id}')">Reset</button>
         </div>
       `).join('');
     });
@@ -967,7 +901,7 @@
   function changeAgentPassword(agentId) {
     const input = document.getElementById(`pw_${sanitizeKey(agentId)}`);
     const newPw = input.value.trim();
-    if (newPw.length < 4) { showToast('Min 4 characters', 'error'); return; }
+    if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
     dbRef.child('user_passwords').child(sanitizeKey(agentId)).set(newPw).then(() => {
       showToast(`Password updated for ${agentId}`, 'success');
       input.value = '';
@@ -975,10 +909,18 @@
     });
   }
 
+  function resetAgentPassword(agentId) {
+    if (!confirm(`Reset password for ${agentId}? They will be prompted to create a new one on next login.`)) return;
+    dbRef.child('user_passwords').child(sanitizeKey(agentId)).remove().then(() => {
+      showToast(`Password reset for ${agentId}`, 'success');
+      renderAgentPasswordsList();
+    });
+  }
+
   function changeAdminPassword() {
     const newPw = document.getElementById('newAdminPwInput').value;
     const confirm = document.getElementById('newAdminPwConfirm').value;
-    if (newPw.length < 4) { showToast('Min 4 characters', 'error'); return; }
+    if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
     if (newPw !== confirm) { showToast('Passwords do not match', 'error'); return; }
     ADMIN_PASSWORD = newPw;
     dbRef.child('admin_password').set(newPw);
@@ -987,7 +929,7 @@
     showToast('Admin password updated!', 'success');
   }
 
-  // ── DELETE & EXPORT ──
+  // DELETE & EXPORT
   function getDeleteFilteredEntries() {
     const from = document.getElementById('deleteFrom').value;
     const to = document.getElementById('deleteTo').value;
@@ -1043,7 +985,7 @@
     showToast('Excel downloaded!', 'success');
   }
 
-  // ── DATA ──
+  // DATA
   function saveEntry(entry) {
     entries[entry.id] = entry;
     dbRef.child('entries').child(entry.id).set(entry);
@@ -1085,7 +1027,7 @@
     }).catch(err => console.error('Firebase sync error:', err));
   }
 
-  // ── UTILS ──
+  // UTILS
   function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
   function formatTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
   function formatDateTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }); }
