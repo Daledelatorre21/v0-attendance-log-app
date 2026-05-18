@@ -1,6 +1,3 @@
-Now I have everything I need. Making all changes:Now add the `badge-primary` style since WIO uses it:Here is the complete code — select all and copy:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -650,14 +647,11 @@ Now I have everything I need. Making all changes:Now add the `badge-primary` sty
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
   }
 
-  // ── ACTIVE TABLE ──────────────────────────────────────────────────
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
     let activeEntries = Object.values(entries).filter(e => !e.logOut);
-    if (currentUser && !currentUser.isAdmin) {
-      activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
-    }
+    if (currentUser && !currentUser.isAdmin) activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
     activeEntries.sort((a, b) => b.logIn - a.logIn);
     if (!activeEntries.length) { tbody.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
@@ -666,25 +660,14 @@ Now I have everything I need. Making all changes:Now add the `badge-primary` sty
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       const elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
-
-      const wsBadge = entry.ws === 'WFH'
-        ? '<span class="badge badge-success">WFH</span>'
-        : '<span class="badge badge-primary">WIO</span>';
-
+      const wsBadge = entry.ws === 'WFH' ? '<span class="badge badge-success">WFH</span>' : '<span class="badge badge-primary">WIO</span>';
       const remarksText = entry.remarks || '';
       const words = remarksText.trim().split(/\s+/);
       const truncated = words.length > 5 ? words.slice(0, 5).join(' ') + '...' : remarksText;
-      const remarksCell = remarksText
-        ? '<span title="' + remarksText.replace(/"/g, '&quot;') + '" style="cursor:default;">' + truncated + '</span>'
-        : '&mdash;';
-
+      const remarksCell = remarksText ? '<span title="' + remarksText.replace(/"/g, '&quot;') + '" style="cursor:default;">' + truncated + '</span>' : '&mdash;';
       const actionBtn = currentUser.isAdmin
-        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'
-          + '<button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Force Log Out</button>'
-          + '<button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Delete</button>'
-          + '</div>'
+        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Force Log Out</button><button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Delete</button></div>'
         : '';
-
       return '<tr class="' + (isOverdue ? 'overdue' : '') + '">'
         + '<td style="font-size:0.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.agent + '"><strong>' + entry.agent + '</strong></td>'
         + '<td style="font-size:0.82rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.lead + '">' + entry.lead + '</td>'
@@ -693,8 +676,7 @@ Now I have everything I need. Making all changes:Now add the `badge-primary` sty
         + '<td>' + wsBadge + '</td>'
         + '<td>' + entry.loc + '</td>'
         + '<td style="font-size:0.85rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + remarksCell + '</td>'
-        + '<td>' + actionBtn + '</td>'
-        + '</tr>';
+        + '<td>' + actionBtn + '</td></tr>';
     }).join('');
   }
 
@@ -726,7 +708,6 @@ Now I have everything I need. Making all changes:Now add the `badge-primary` sty
     closeForceLogout();
   }
 
-  // ── REPORT ────────────────────────────────────────────────────────
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
@@ -962,4 +943,3 @@ Now I have everything I need. Making all changes:Now add the `badge-primary` sty
 </script>
 </body>
 </html>
-```
