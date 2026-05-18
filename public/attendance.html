@@ -1,3 +1,6 @@
+Here is the complete code — select all and copy:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,6 +137,12 @@
     .pw-item-input { flex: 1; padding: 0.4rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.85rem; min-width: 140px; }
     .pw-item-input:focus { outline: none; border-color: #1a6fc4; }
 
+    .shift-settings-card { background: #f9fafb; border-radius: 12px; padding: 1.5rem; border: 1px solid #e5e7eb; }
+    .shift-time-row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1.25rem; }
+    .shift-time-row .form-group { min-width: 160px; flex: 1; }
+    .shift-info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.88rem; color: #1e40af; margin-top: 1rem; line-height: 1.6; }
+    .shift-info-box strong { font-weight: 700; }
+
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
     .modal { background: white; border-radius: 16px; padding: 2rem; width: 100%; max-width: 420px; }
@@ -151,7 +160,7 @@
     .settings-body { padding: 1.5rem; }
     .settings-lock { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
     .settings-lock-icon { width: 60px; height: 60px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.5rem; }
-    .settings-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .settings-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
     .settings-menu-btn { padding: 1.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s; font-family: inherit; }
     .settings-menu-btn:hover { background: #eff6ff; border-color: #1a6fc4; }
     .settings-menu-btn .icon { font-size: 2rem; margin-bottom: 0.5rem; }
@@ -178,6 +187,7 @@
       .form-group { width: 100%; }
       .settings-menu { grid-template-columns: 1fr; }
       .pw-item { flex-direction: column; align-items: flex-start; }
+      .shift-time-row { flex-direction: column; }
     }
   </style>
 </head>
@@ -409,6 +419,9 @@
           <button class="settings-menu-btn" onclick="showSettingsView('passwords')">
             <div class="icon">🔑</div><div class="label">Passwords</div><div class="sublabel">Manage all passwords</div>
           </button>
+          <button class="settings-menu-btn" onclick="showSettingsView('shift')">
+            <div class="icon">🕐</div><div class="label">Shift Window</div><div class="sublabel">Set shift start & end times</div>
+          </button>
         </div>
       </div>
       <div id="settingsAdminView" style="display:none;">
@@ -438,6 +451,27 @@
         </div>
         <div class="section-title">Agent Passwords</div>
         <div class="pw-list" id="agentPasswordsList"></div>
+      </div>
+      <div id="settingsShiftView" style="display:none;">
+        <button class="settings-back" onclick="showSettingsView('menu')">← Back</button>
+        <div class="section-title">Shift Window</div>
+        <div class="shift-settings-card">
+          <p style="font-size:0.9rem;color:#4b5563;margin-bottom:1.25rem;">
+            Define when a shift starts and ends. Logins made after midnight but before the shift end time will be counted as part of the <em>previous</em> day's shift.
+          </p>
+          <div class="shift-time-row">
+            <div class="form-group">
+              <label class="form-label">Shift Start</label>
+              <input type="time" class="form-input" id="shiftStartInput">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Shift End <span style="font-size:0.78rem;color:#6b7280;">(next day if past midnight)</span></label>
+              <input type="time" class="form-input" id="shiftEndInput">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveShiftSettings()">💾 Save Shift Window</button>
+          <div class="shift-info-box" id="shiftInfoBox"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -481,7 +515,7 @@
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
     <h3 class="modal-title">⚠️ Confirm Delete</h3>
-    <p id="confirmMessage"></p>
+    <p id="confirmMessage" style="color:#4b5563;font-size:0.95rem;line-height:1.6;"></p>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="document.getElementById('confirmModal').classList.remove('active')">Cancel</button>
       <button class="btn btn-danger" onclick="deleteEntries()">Delete</button>
@@ -508,30 +542,66 @@
   let ADMIN_PASSWORD = 'Pineapple';
   const SETTINGS_PASSWORD = 'Glendale';
 
-  // ── PRELOAD agents from localStorage instantly, then refresh from Firebase ──
+  // ── SHIFT WINDOW — default 2:00 PM start, 2:00 AM end ──
+  let shiftSettings = { startHour: 14, startMinute: 0, endHour: 2, endMinute: 0 };
+
+  function getShiftDate(ts) {
+    const d = new Date(ts);
+    const totalMinutes = d.getHours() * 60 + d.getMinutes();
+    const endTotalMinutes = shiftSettings.endHour * 60 + shiftSettings.endMinute;
+    const crossesMidnight = shiftSettings.endHour < shiftSettings.startHour ||
+      (shiftSettings.endHour === shiftSettings.startHour && shiftSettings.endMinute < shiftSettings.startMinute);
+    if (crossesMidnight && totalMinutes < endTotalMinutes) {
+      const prev = new Date(d);
+      prev.setDate(prev.getDate() - 1);
+      prev.setHours(0, 0, 0, 0);
+      return prev;
+    }
+    const result = new Date(d);
+    result.setHours(0, 0, 0, 0);
+    return result;
+  }
+
+  function getShiftDateString(ts) { return getShiftDate(ts).toDateString(); }
+  function getCurrentShiftDateString() { return getShiftDateString(Date.now()); }
+
+  function formatShiftInfo() {
+    const fmt = (h, m) => {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hh = h % 12 || 12;
+      return hh + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+    };
+    const sh = shiftSettings.startHour, sm = shiftSettings.startMinute;
+    const eh = shiftSettings.endHour, em = shiftSettings.endMinute;
+    const crossesMidnight = eh < sh || (eh === sh && em <= sm);
+    const dayNote = crossesMidnight ? ' (next day)' : '';
+    return 'Active shift: <strong>' + fmt(sh,sm) + '</strong> &rarr; <strong>' + fmt(eh,em) + dayNote + '</strong>. '
+      + (crossesMidnight
+        ? 'Logins between midnight and <strong>' + fmt(eh,em) + '</strong> are counted as the <strong>previous day\'s</strong> shift.'
+        : 'All logins within the same calendar day are counted together.');
+  }
+
   (function initData() {
     const a = localStorage.getItem('attendance_agents');
     const l = localStorage.getItem('attendance_leads');
+    const s = localStorage.getItem('attendance_shift');
     if (a) agents = JSON.parse(a);
     if (l) leads = JSON.parse(l);
-    // Refresh from Firebase in background
+    if (s) shiftSettings = JSON.parse(s);
     dbRef.once('value').then(snap => {
       const data = snap.val();
       if (data) {
         if (data.agents) { agents = data.agents; localStorage.setItem('attendance_agents', JSON.stringify(agents)); }
         if (data.leads) { leads = data.leads; localStorage.setItem('attendance_leads', JSON.stringify(leads)); }
         if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
+        if (data.shift_settings) { shiftSettings = data.shift_settings; localStorage.setItem('attendance_shift', JSON.stringify(shiftSettings)); }
       }
     });
   })();
 
-  // ── RESTORE SESSION on refresh (sessionStorage — cleared when tab closes) ──
   (function restoreSession() {
     const saved = sessionStorage.getItem('currentUser');
-    if (saved) {
-      currentUser = JSON.parse(saved);
-      showApp();
-    }
+    if (saved) { currentUser = JSON.parse(saved); showApp(); }
   })();
 
   function showApp() {
@@ -544,25 +614,20 @@
     initApp();
   }
 
-  // LOGIN
   function handleLogin() {
     const loginId = document.getElementById('loginId').value.trim();
     const password = document.getElementById('loginPassword').value;
     document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
-
     if (loginId.toLowerCase() === 'admin') {
       if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); showApp(); }
       else showLoginError('Invalid Agent ID or password.');
       return;
     }
-
     const isRegistered = agents.some(a => a.toLowerCase() === loginId.toLowerCase());
     if (!isRegistered) { showLoginError('Agent ID is not registered. Please contact your admin.'); return; }
-
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in...';
-
     dbRef.child('user_passwords').child(sanitizeKey(loginId)).once('value').then(snap => {
       const stored = snap.val();
       btn.disabled = false; btn.textContent = 'Sign In';
@@ -610,14 +675,11 @@
     document.getElementById('actionHeader').style.display = '';
   }
 
-  // INIT APP
   function initApp() {
     initFirebaseConnection();
     initNavigation();
     initEntryForm();
     loadFromLocalStorage();
-
-    // ── REAL-TIME LISTENER — updates instantly on all devices ──
     dbRef.on('value', snap => {
       const data = snap.val();
       if (data) {
@@ -625,16 +687,14 @@
         if (data.agents) { agents = data.agents; localStorage.setItem('attendance_agents', JSON.stringify(agents)); updateAgentsDatalist(); }
         if (data.leads) { leads = data.leads; localStorage.setItem('attendance_leads', JSON.stringify(leads)); updateLeadsDropdown(); }
         if (data.admin_password) ADMIN_PASSWORD = data.admin_password;
+        if (data.shift_settings) { shiftSettings = data.shift_settings; localStorage.setItem('attendance_shift', JSON.stringify(shiftSettings)); }
         localStorage.setItem('attendance_entries', JSON.stringify(entries));
         renderActiveTable();
         const activeTab = document.querySelector('.nav-btn.active')?.dataset?.tab;
         if (activeTab === 'report') renderReport();
       }
     });
-
-    // Also update elapsed times every 5 seconds
     setInterval(() => renderActiveTable(), 5000);
-
     const today = new Date().toISOString().split('T')[0];
     ['exportFrom','exportTo','deleteFrom','deleteTo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = today; });
   }
@@ -654,7 +714,7 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
-        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
         if (tab === 'report') renderReport();
       });
     });
@@ -683,7 +743,7 @@
     if (activeEntry) {
       teamLead.value = activeEntry.lead; workStatus.value = activeEntry.ws; location.value = activeEntry.loc;
       teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
-      infoNote.innerHTML = `<strong>${activeEntry.agent}</strong> clocked in at <span class="mono">${formatTime(activeEntry.logIn)}</span>`;
+      infoNote.innerHTML = '<strong>' + activeEntry.agent + '</strong> clocked in at <span class="mono">' + formatTime(activeEntry.logIn) + '</span>';
       infoNote.classList.add('visible');
       submitBtn.innerHTML = '<span>🚪</span> Log Out'; submitBtn.classList.remove('btn-primary'); submitBtn.classList.add('btn-danger');
     } else {
@@ -702,7 +762,7 @@
     if (!agentName || !teamLead || !workStatus || !location) { showToast('Please fill in all required fields', 'error'); return; }
     const entry = { id: generateId(), agent: agentName, lead: teamLead, ws: workStatus, loc: location, remarks, logIn: Date.now(), logOut: null, logOutRemarks: null };
     saveEntry(entry); resetForm();
-    showToast(`⏱ ${agentName} clocked in!`, 'success');
+    showToast('⏱ ' + agentName + ' clocked in!', 'success');
   }
 
   function handleFormLogout() {
@@ -719,7 +779,7 @@
   function submitSelfLogout() {
     const remarks = document.getElementById('logoutRemarks').value.trim();
     const entry = entries[selfLogoutId];
-    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || null; saveEntry(entry); showToast(`👋 ${entry.agent} clocked out!`, 'success'); }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || null; saveEntry(entry); showToast('👋 ' + entry.agent + ' clocked out!', 'success'); }
     document.getElementById('logoutModal').classList.remove('active');
     selfLogoutId = null; resetForm();
   }
@@ -733,13 +793,17 @@
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
   }
 
-  // ACTIVE TABLE
+  // ── ACTIVE TABLE ─────────────────────────────────────────────────
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
-    const today = new Date().toDateString();
-    let activeEntries = Object.values(entries).filter(e => !e.logOut && new Date(e.logIn).toDateString() === today);
-    if (currentUser && !currentUser.isAdmin) activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    const currentShiftDate = getCurrentShiftDateString();
+    let activeEntries = Object.values(entries).filter(e =>
+      !e.logOut && getShiftDateString(e.logIn) === currentShiftDate
+    );
+    if (currentUser && !currentUser.isAdmin) {
+      activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    }
     activeEntries.sort((a, b) => b.logIn - a.logIn);
     if (!activeEntries.length) { tbody.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
@@ -748,15 +812,28 @@
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       let elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
-      const actionBtn = currentUser.isAdmin ? `<button class="btn btn-danger btn-sm" onclick="openForceLogout('${entry.id}','${entry.agent}')">Force Log Out</button>` : '';
-      return `<tr class="${isOverdue ? 'overdue' : ''}">
-        <td><strong>${entry.agent}</strong></td><td>${entry.lead}</td>
-        <td class="mono">${formatTime(entry.logIn)}</td>
-        <td class="mono ${elapsedClass}">${formatElapsed(elapsed)}</td>
-        <td>${isOverdue ? '<span class="badge badge-danger">⚠ Overdue</span>' : '<span class="badge badge-success">Active</span>'}</td>
-        <td>${entry.loc}</td><td>${entry.remarks || '—'}</td><td>${actionBtn}</td>
-      </tr>`;
+      const actionBtn = currentUser.isAdmin
+        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent + '\')">Force Log Out</button><button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent + '\')">Delete</button></div>'
+        : '';
+      return '<tr class="' + (isOverdue ? 'overdue' : '') + '">'
+        + '<td><strong>' + entry.agent + '</strong></td>'
+        + '<td>' + entry.lead + '</td>'
+        + '<td class="mono">' + formatTime(entry.logIn) + '</td>'
+        + '<td class="mono ' + elapsedClass + '">' + formatElapsed(elapsed) + '</td>'
+        + '<td>' + (isOverdue ? '<span class="badge badge-danger">&#9888; Overdue</span>' : '<span class="badge badge-success">Active</span>') + '</td>'
+        + '<td>' + entry.loc + '</td>'
+        + '<td>' + (entry.remarks || '&mdash;') + '</td>'
+        + '<td>' + actionBtn + '</td>'
+        + '</tr>';
     }).join('');
+  }
+
+  function deleteActiveEntry(id, name) {
+    if (!confirm('Delete entry for ' + name + '? This cannot be undone.')) return;
+    delete entries[id];
+    dbRef.child('entries').child(id).remove();
+    localStorage.setItem('attendance_entries', JSON.stringify(entries));
+    showToast(name + "'s entry deleted", 'success');
   }
 
   function openForceLogout(id, name) {
@@ -775,38 +852,40 @@
     const remarks = document.getElementById('forceLogoutRemarks').value.trim();
     if (pw !== ADMIN_PASSWORD) { showToast('Incorrect admin password', 'error'); return; }
     const entry = entries[forceLogoutId];
-    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || 'Force logout by admin'; saveEntry(entry); showToast(`👋 ${entry.agent} force logged out!`, 'success'); }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || 'Force logout by admin'; saveEntry(entry); showToast('👋 ' + entry.agent + ' force logged out!', 'success'); }
     closeForceLogout();
   }
 
-  // REPORT
+  // ── REPORT ───────────────────────────────────────────────────────
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
     let completedEntries = Object.values(entries).filter(e => e.logOut);
-    if (currentUser && !currentUser.isAdmin) completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    if (currentUser && !currentUser.isAdmin) {
+      completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    }
     if (!completedEntries.length) { content.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
     const grouped = {};
     completedEntries.forEach(entry => {
-      const date = new Date(entry.logIn);
-      const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-      const dayKey = date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
+      const shiftDate = getShiftDate(entry.logIn);
+      const monthKey = shiftDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const dayKey = shiftDate.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
       if (!grouped[monthKey]) grouped[monthKey] = {};
       if (!grouped[monthKey][dayKey]) grouped[monthKey][dayKey] = [];
       grouped[monthKey][dayKey].push(entry);
     });
     let html = '';
     Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(month => {
-      html += `<div class="month-group"><div class="group-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${month} (${Object.values(grouped[month]).flat().length} entries)</div><div class="group-content">`;
+      html += '<div class="month-group"><div class="group-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>' + month + ' (' + Object.values(grouped[month]).flat().length + ' entries)</div><div class="group-content">';
       Object.keys(grouped[month]).forEach(day => {
         const dayEntries = grouped[month][day].sort((a, b) => b.logIn - a.logIn);
-        html += `<div class="day-group"><div class="day-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${day} (${dayEntries.length})</div><div class="day-content"><div class="table-container"><table><thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Log Out</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th></tr></thead><tbody>${dayEntries.map(entry => {
+        html += '<div class="day-group"><div class="day-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>' + day + ' (' + dayEntries.length + ')</div><div class="day-content"><div class="table-container"><table><thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Log Out</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th></tr></thead><tbody>' + dayEntries.map(entry => {
           const elapsed = getElapsedTime(entry.logIn, entry.logOut);
           const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
           let ec = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
-          return `<tr><td><strong>${entry.agent}</strong></td><td>${entry.lead}</td><td class="mono">${formatTime(entry.logIn)}</td><td class="mono">${formatTime(entry.logOut)}</td><td class="mono ${ec}">${formatElapsed(elapsed)}</td><td>${entry.ws}</td><td>${entry.loc}</td><td>${entry.remarks || '—'}</td></tr>`;
-        }).join('')}</tbody></table></div></div></div>`;
+          return '<tr><td><strong>' + entry.agent + '</strong></td><td>' + entry.lead + '</td><td class="mono">' + formatTime(entry.logIn) + '</td><td class="mono">' + formatTime(entry.logOut) + '</td><td class="mono ' + ec + '">' + formatElapsed(elapsed) + '</td><td>' + entry.ws + '</td><td>' + entry.loc + '</td><td>' + (entry.remarks || '—') + '</td></tr>';
+        }).join('') + '</tbody></table></div></div></div>';
       });
       html += '</div></div>';
     });
@@ -815,13 +894,14 @@
 
   function toggleGroup(header) { header.classList.toggle('expanded'); header.nextElementSibling.classList.toggle('expanded'); }
 
-  // SETTINGS
+  // ── SETTINGS ─────────────────────────────────────────────────────
   function openSettings() {
     settingsUnlocked = false;
     document.getElementById('settingsLock').style.display = 'block';
     document.getElementById('settingsMenu').style.display = 'none';
     document.getElementById('settingsAdminView').style.display = 'none';
     document.getElementById('settingsPasswordsView').style.display = 'none';
+    document.getElementById('settingsShiftView').style.display = 'none';
     document.getElementById('settingsPasswordInput').value = '';
     document.getElementById('settingsOverlay').classList.add('active');
     setTimeout(() => document.getElementById('settingsPasswordInput').focus(), 100);
@@ -832,27 +912,54 @@
 
   function unlockSettings() {
     const pw = document.getElementById('settingsPasswordInput').value;
-    if (pw === SETTINGS_PASSWORD) { settingsUnlocked = true; document.getElementById('settingsLock').style.display = 'none'; document.getElementById('settingsMenu').style.display = 'block'; }
-    else { showToast('Incorrect password', 'error'); document.getElementById('settingsPasswordInput').value = ''; }
+    if (pw === SETTINGS_PASSWORD) {
+      settingsUnlocked = true;
+      document.getElementById('settingsLock').style.display = 'none';
+      document.getElementById('settingsMenu').style.display = 'block';
+    } else {
+      showToast('Incorrect password', 'error');
+      document.getElementById('settingsPasswordInput').value = '';
+    }
   }
 
   function showSettingsView(view) {
     document.getElementById('settingsMenu').style.display = 'none';
     document.getElementById('settingsAdminView').style.display = 'none';
     document.getElementById('settingsPasswordsView').style.display = 'none';
+    document.getElementById('settingsShiftView').style.display = 'none';
     if (view === 'menu') { document.getElementById('settingsMenu').style.display = 'block'; return; }
     if (view === 'admin') { document.getElementById('settingsAdminView').style.display = 'block'; renderAgentsTags(); renderLeadsTags(); }
     if (view === 'passwords') { document.getElementById('settingsPasswordsView').style.display = 'block'; renderAgentPasswordsList(); }
+    if (view === 'shift') {
+      document.getElementById('settingsShiftView').style.display = 'block';
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('shiftStartInput').value = pad(shiftSettings.startHour) + ':' + pad(shiftSettings.startMinute);
+      document.getElementById('shiftEndInput').value = pad(shiftSettings.endHour) + ':' + pad(shiftSettings.endMinute);
+      document.getElementById('shiftInfoBox').innerHTML = formatShiftInfo();
+    }
   }
 
-  // AGENTS & LEADS
+  function saveShiftSettings() {
+    const startVal = document.getElementById('shiftStartInput').value;
+    const endVal = document.getElementById('shiftEndInput').value;
+    if (!startVal || !endVal) { showToast('Please set both start and end times', 'error'); return; }
+    const [sh, sm] = startVal.split(':').map(Number);
+    const [eh, em] = endVal.split(':').map(Number);
+    shiftSettings = { startHour: sh, startMinute: sm, endHour: eh, endMinute: em };
+    dbRef.child('shift_settings').set(shiftSettings);
+    localStorage.setItem('attendance_shift', JSON.stringify(shiftSettings));
+    document.getElementById('shiftInfoBox').innerHTML = formatShiftInfo();
+    showToast('Shift window saved!', 'success');
+    renderActiveTable();
+  }
+
   function addAgents() {
     const names = document.getElementById('agentsBulk').value.split('\n').map(n => n.trim()).filter(n => n);
     if (!names.length) return;
     agents = [...new Set([...agents, ...names])];
     saveAgentsAndLeads(); document.getElementById('agentsBulk').value = '';
     renderAgentsTags(); updateAgentsDatalist();
-    showToast(`Added ${names.length} agent(s)`, 'success');
+    showToast('Added ' + names.length + ' agent(s)', 'success');
   }
 
   function addLeads() {
@@ -861,63 +968,54 @@
     leads = [...new Set([...leads, ...names])];
     saveAgentsAndLeads(); document.getElementById('leadsBulk').value = '';
     renderLeadsTags(); updateLeadsDropdown();
-    showToast(`Added ${names.length} lead(s)`, 'success');
+    showToast('Added ' + names.length + ' lead(s)', 'success');
   }
 
   function removeAgent(name) { agents = agents.filter(a => a !== name); saveAgentsAndLeads(); renderAgentsTags(); updateAgentsDatalist(); }
   function removeLead(name) { leads = leads.filter(l => l !== name); saveAgentsAndLeads(); renderLeadsTags(); updateLeadsDropdown(); }
 
   function renderAgentsTags() {
-    document.getElementById('agentsTags').innerHTML = agents.map(a => `<span class="tag">${a}<button class="tag-remove" onclick="removeAgent('${a}')">&times;</button></span>`).join('');
+    document.getElementById('agentsTags').innerHTML = agents.map(a => '<span class="tag">' + a + '<button class="tag-remove" onclick="removeAgent(\'' + a + '\')">&times;</button></span>').join('');
   }
 
   function renderLeadsTags() {
-    document.getElementById('leadsTags').innerHTML = leads.map(l => `<span class="tag">${l}<button class="tag-remove" onclick="removeLead('${l}')">&times;</button></span>`).join('');
+    document.getElementById('leadsTags').innerHTML = leads.map(l => '<span class="tag">' + l + '<button class="tag-remove" onclick="removeLead(\'' + l + '\')">&times;</button></span>').join('');
   }
 
   function updateAgentsDatalist() {
-    document.getElementById('agentsList').innerHTML = agents.map(a => `<option value="${a}">`).join('');
+    document.getElementById('agentsList').innerHTML = agents.map(a => '<option value="' + a + '">').join('');
   }
 
   function updateLeadsDropdown() {
     const select = document.getElementById('teamLead');
     const cur = select.value;
-    select.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => `<option value="${l}">${l}</option>`).join('');
+    select.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => '<option value="' + l + '">' + l + '</option>').join('');
     if (leads.includes(cur)) select.value = cur;
   }
 
-  // PASSWORDS
   function renderAgentPasswordsList() {
     const container = document.getElementById('agentPasswordsList');
     if (!agents.length) { container.innerHTML = '<p style="color:#9ca3af;font-size:0.9rem;">No agents added yet.</p>'; return; }
     Promise.all(agents.map(agentId =>
       dbRef.child('user_passwords').child(sanitizeKey(agentId)).once('value').then(snap => ({ id: agentId, pw: snap.val() }))
     )).then(results => {
-      container.innerHTML = results.map(r => `
-        <div class="pw-item">
-          <div class="pw-item-id">${r.id}</div>
-          <div class="pw-item-pw">${r.pw === null ? '<em style="color:#f59e0b">(not set)</em>' : '••••••'}</div>
-          <input type="password" class="pw-item-input" id="pw_${sanitizeKey(r.id)}" placeholder="New password" maxlength="20">
-          <button class="btn btn-primary btn-sm" onclick="changeAgentPassword('${r.id}')">Save</button>
-          <button class="btn btn-warning btn-sm" onclick="resetAgentPassword('${r.id}')">Reset</button>
-        </div>
-      `).join('');
+      container.innerHTML = results.map(r => '<div class="pw-item"><div class="pw-item-id">' + r.id + '</div><div class="pw-item-pw">' + (r.pw === null ? '<em style="color:#f59e0b">(not set)</em>' : '••••••') + '</div><input type="password" class="pw-item-input" id="pw_' + sanitizeKey(r.id) + '" placeholder="New password" maxlength="20"><button class="btn btn-primary btn-sm" onclick="changeAgentPassword(\'' + r.id + '\')">Save</button><button class="btn btn-warning btn-sm" onclick="resetAgentPassword(\'' + r.id + '\')">Reset</button></div>').join('');
     });
   }
 
   function changeAgentPassword(agentId) {
-    const input = document.getElementById(`pw_${sanitizeKey(agentId)}`);
+    const input = document.getElementById('pw_' + sanitizeKey(agentId));
     const newPw = input.value.trim();
     if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
     dbRef.child('user_passwords').child(sanitizeKey(agentId)).set(newPw).then(() => {
-      showToast(`Password updated for ${agentId}`, 'success'); input.value = ''; renderAgentPasswordsList();
+      showToast('Password updated for ' + agentId, 'success'); input.value = ''; renderAgentPasswordsList();
     });
   }
 
   function resetAgentPassword(agentId) {
-    if (!confirm(`Reset password for ${agentId}? They will be prompted to create a new one on next login.`)) return;
+    if (!confirm('Reset password for ' + agentId + '? They will be prompted to create a new one on next login.')) return;
     dbRef.child('user_passwords').child(sanitizeKey(agentId)).remove().then(() => {
-      showToast(`Password reset for ${agentId}`, 'success'); renderAgentPasswordsList();
+      showToast('Password reset for ' + agentId, 'success'); renderAgentPasswordsList();
     });
   }
 
@@ -933,7 +1031,6 @@
     showToast('Admin password updated!', 'success');
   }
 
-  // DELETE & EXPORT
   function getDeleteFilteredEntries() {
     const from = document.getElementById('deleteFrom').value;
     const to = document.getElementById('deleteTo').value;
@@ -953,7 +1050,7 @@
   function confirmDeleteEntries() {
     const count = getDeleteFilteredEntries().length;
     if (!count) { showToast('No entries to delete', 'info'); return; }
-    document.getElementById('confirmMessage').textContent = `Delete ${count} entries? This cannot be undone.`;
+    document.getElementById('confirmMessage').textContent = 'Delete ' + count + ' entries? This cannot be undone.';
     document.getElementById('confirmModal').classList.add('active');
   }
 
@@ -963,7 +1060,7 @@
     localStorage.setItem('attendance_entries', JSON.stringify(entries));
     renderActiveTable(); renderReport();
     document.getElementById('confirmModal').classList.remove('active');
-    showToast(`Deleted ${toDelete.length} entries`, 'success');
+    showToast('Deleted ' + toDelete.length + ' entries', 'success');
   }
 
   function exportToExcel() {
@@ -981,19 +1078,25 @@
     if (!filtered.length) { showToast('No entries to export', 'info'); return; }
     const data = filtered.map(e => {
       const elapsed = e.logOut ? getElapsedTime(e.logIn, e.logOut) : getElapsedTime(e.logIn);
-      return { 'Date': new Date(e.logIn).toLocaleDateString(), 'Agent ID': e.agent, 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc, 'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '', 'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active', 'Log-In Remarks': e.remarks || '', 'Log-Out Remarks': e.logOutRemarks || '' };
+      const shiftDate = getShiftDate(e.logIn);
+      return {
+        'Shift Date': shiftDate.toLocaleDateString(),
+        'Agent ID': e.agent, 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc,
+        'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '',
+        'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active',
+        'Log-In Remarks': e.remarks || '', 'Log-Out Remarks': e.logOutRemarks || ''
+      };
     });
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
-    XLSX.writeFile(wb, `attendance_${document.getElementById('exportFrom').value}_to_${document.getElementById('exportTo').value}.xlsx`);
+    XLSX.writeFile(wb, 'attendance_' + document.getElementById('exportFrom').value + '_to_' + document.getElementById('exportTo').value + '.xlsx');
     showToast('Excel downloaded!', 'success');
   }
 
-  // DATA
   function saveEntry(entry) {
     entries[entry.id] = entry;
-    dbRef.child('entries').child(entry.id).set(entry); // Firebase real-time listener handles UI update
+    dbRef.child('entries').child(entry.id).set(entry);
   }
 
   function saveAgentsAndLeads() {
@@ -1008,20 +1111,20 @@
     if (e) { entries = JSON.parse(e); renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown(); }
   }
 
-  // UTILS
   function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
   function formatTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
   function formatDateTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }); }
   function getElapsedTime(start, end = Date.now()) { const diff = end - start; return { days: Math.floor(diff/86400000), hours: Math.floor((diff%86400000)/3600000), minutes: Math.floor((diff%3600000)/60000) }; }
-  function formatElapsed(e) { return e.days > 0 ? `${e.days}d ${e.hours}h ${e.minutes}m` : `${e.hours}h ${e.minutes}m`; }
+  function formatElapsed(e) { return e.days > 0 ? e.days + 'd ' + e.hours + 'h ' + e.minutes + 'm' : e.hours + 'h ' + e.minutes + 'm'; }
 
   function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`; toast.textContent = message;
+    toast.className = 'toast ' + type; toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, 3000);
   }
 </script>
 </body>
 </html>
+```
