@@ -1,3 +1,6 @@
+Now I have everything I need. Making all changes:Now add the `badge-primary` style since WIO uses it:Here is the complete code — select all and copy:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,6 +97,7 @@
     .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
     .badge-success { background: #dcfce7; color: #16a34a; }
     .badge-danger { background: #fee2e2; color: #ef4444; }
+    .badge-primary { background: #dbeafe; color: #1d4ed8; }
     .elapsed-green { color: #16a34a; }
     .elapsed-amber { color: #d97706; }
     .elapsed-red { color: #ef4444; }
@@ -287,7 +291,7 @@
         <h2 class="card-title">Today's Active Entries</h2>
         <div class="table-container">
           <table>
-            <thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th><th>Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th></tr></thead>
+            <thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th></tr></thead>
             <tbody id="activeTableBody"></tbody>
           </table>
         </div>
@@ -646,7 +650,7 @@
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
   }
 
-  // ── ACTIVE TABLE — shows ALL currently clocked-in agents ──────────
+  // ── ACTIVE TABLE ──────────────────────────────────────────────────
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
@@ -662,15 +666,35 @@
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       const elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
+
+      const wsBadge = entry.ws === 'WFH'
+        ? '<span class="badge badge-success">WFH</span>'
+        : '<span class="badge badge-primary">WIO</span>';
+
+      const remarksText = entry.remarks || '';
+      const words = remarksText.trim().split(/\s+/);
+      const truncated = words.length > 5 ? words.slice(0, 5).join(' ') + '...' : remarksText;
+      const remarksCell = remarksText
+        ? '<span title="' + remarksText.replace(/"/g, '&quot;') + '" style="cursor:default;">' + truncated + '</span>'
+        : '&mdash;';
+
       const actionBtn = currentUser.isAdmin
-        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent + '\')">Force Log Out</button><button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent + '\')">Delete</button></div>'
+        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'
+          + '<button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Force Log Out</button>'
+          + '<button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Delete</button>'
+          + '</div>'
         : '';
+
       return '<tr class="' + (isOverdue ? 'overdue' : '') + '">'
-        + '<td><strong>' + entry.agent + '</strong></td><td>' + entry.lead + '</td>'
+        + '<td style="font-size:0.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.agent + '"><strong>' + entry.agent + '</strong></td>'
+        + '<td style="font-size:0.82rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.lead + '">' + entry.lead + '</td>'
         + '<td class="mono">' + formatTime(entry.logIn) + '</td>'
         + '<td class="mono ' + elapsedClass + '">' + formatElapsed(elapsed) + '</td>'
-        + '<td>' + (isOverdue ? '<span class="badge badge-danger">&#9888; Overdue</span>' : '<span class="badge badge-success">Active</span>') + '</td>'
-        + '<td>' + entry.loc + '</td><td>' + (entry.remarks || '&mdash;') + '</td><td>' + actionBtn + '</td></tr>';
+        + '<td>' + wsBadge + '</td>'
+        + '<td>' + entry.loc + '</td>'
+        + '<td style="font-size:0.85rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + remarksCell + '</td>'
+        + '<td>' + actionBtn + '</td>'
+        + '</tr>';
     }).join('');
   }
 
@@ -702,7 +726,7 @@
     closeForceLogout();
   }
 
-  // ── REPORT — grouped by shift date ───────────────────────────────
+  // ── REPORT ────────────────────────────────────────────────────────
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
@@ -938,3 +962,4 @@
 </script>
 </body>
 </html>
+```
