@@ -84,6 +84,7 @@
     .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
     .info-note { display: none; padding: 0.75rem 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af; font-size: 0.9rem; margin-top: 1rem; }
     .info-note.visible { display: block; }
+    .info-note.warning { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
@@ -432,6 +433,7 @@
   const SETTINGS_PASSWORD = 'Glendale';
   let shiftSettings = { startHour: 14, startMinute: 0, endHour: 2, endMinute: 0 };
 
+  // ── SHIFT DATE HELPERS ────────────────────────────────────────────
   function getShiftDate(ts) {
     const d = new Date(ts);
     const totalMinutes = d.getHours() * 60 + d.getMinutes();
@@ -442,6 +444,19 @@
       const prev = new Date(d); prev.setDate(prev.getDate() - 1); prev.setHours(0,0,0,0); return prev;
     }
     const result = new Date(d); result.setHours(0,0,0,0); return result;
+  }
+
+  function getShiftDateString(ts) { return getShiftDate(ts).toDateString(); }
+  function getCurrentShiftDateString() { return getShiftDateString(Date.now()); }
+
+  // Check if agent already has a completed entry in the current shift window
+  function hasCompletedEntryThisShift(agentName) {
+    const currentShift = getCurrentShiftDateString();
+    return Object.values(entries).some(e =>
+      e.agent && e.agent.toLowerCase() === agentName.toLowerCase() &&
+      e.logOut &&
+      getShiftDateString(e.logIn) === currentShift
+    );
   }
 
   function formatShiftInfo() {
@@ -547,6 +562,8 @@
         renderActiveTable();
         const activeTab = document.querySelector('.nav-btn.active')?.dataset?.tab;
         if (activeTab === 'report') renderReport();
+        // Re-run agent input check in case entries updated
+        if (currentUser && !currentUser.isAdmin) handleAgentInput();
       }
     });
     setInterval(() => renderActiveTable(), 5000);
@@ -593,18 +610,50 @@
     const location = document.getElementById('location');
     const submitBtn = document.getElementById('submitBtn');
     const infoNote = document.getElementById('infoNote');
-    const activeEntry = Object.values(entries).find(e => e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut);
+
+    if (!agentName) {
+      // Reset to clean state
+      teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
+      infoNote.classList.remove('visible', 'warning');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>⏱</span> Log In';
+      submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
+      return;
+    }
+
+    // Priority 1: Already has active entry → show Log Out button
+    const activeEntry = Object.values(entries).find(e =>
+      e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
+    );
+
     if (activeEntry) {
       teamLead.value = activeEntry.lead; workStatus.value = activeEntry.ws; location.value = activeEntry.loc;
       teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
+      infoNote.className = 'info-note visible';
       infoNote.innerHTML = '<strong>' + activeEntry.agent + '</strong> clocked in at <span class="mono">' + formatTime(activeEntry.logIn) + '</span>';
-      infoNote.classList.add('visible');
-      submitBtn.innerHTML = '<span>🚪</span> Log Out'; submitBtn.classList.remove('btn-primary'); submitBtn.classList.add('btn-danger');
-    } else {
-      teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
-      infoNote.classList.remove('visible');
-      submitBtn.innerHTML = '<span>⏱</span> Log In'; submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>🚪</span> Log Out';
+      submitBtn.classList.remove('btn-primary'); submitBtn.classList.add('btn-danger');
+      return;
     }
+
+    // Priority 2: Already completed a shift today → block double entry
+    if (hasCompletedEntryThisShift(agentName)) {
+      teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
+      infoNote.className = 'info-note visible warning';
+      infoNote.innerHTML = '⛔ <strong>' + agentName + '</strong> has already completed a shift today. Double entry is not allowed.';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>⛔</span> Already Logged Today';
+      submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
+      return;
+    }
+
+    // Priority 3: Clean state — ready to log in
+    teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
+    infoNote.classList.remove('visible', 'warning');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span>⏱</span> Log In';
+    submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
   }
 
   function handleLogIn() {
@@ -614,6 +663,13 @@
     const location = document.getElementById('location').value;
     const remarks = document.getElementById('remarks').value.trim();
     if (!agentName || !teamLead || !workStatus || !location) { showToast('Please fill in all required fields', 'error'); return; }
+
+    // Safety guard: block double entry even if UI check was bypassed
+    if (hasCompletedEntryThisShift(agentName)) {
+      showToast(agentName + ' already completed a shift today. Double entry not allowed.', 'error');
+      return;
+    }
+
     const entry = { id: generateId(), agent: agentName, lead: teamLead, ws: workStatus, loc: location, remarks, logIn: Date.now(), logOut: null, logOutRemarks: null };
     saveEntry(entry); resetForm();
     showToast('⏱ ' + agentName + ' clocked in!', 'success');
@@ -642,11 +698,15 @@
     document.getElementById('entryForm').reset();
     if (currentUser && !currentUser.isAdmin) { document.getElementById('agentName').value = currentUser.id; document.getElementById('agentName').disabled = true; }
     ['teamLead','workStatus','location'].forEach(id => document.getElementById(id).disabled = false);
-    document.getElementById('infoNote').classList.remove('visible');
+    document.getElementById('infoNote').classList.remove('visible', 'warning');
     const btn = document.getElementById('submitBtn');
+    btn.disabled = false;
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
+    // Re-check after reset (for non-admin agents)
+    if (currentUser && !currentUser.isAdmin) setTimeout(handleAgentInput, 100);
   }
 
+  // ── ACTIVE TABLE ──────────────────────────────────────────────────
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
@@ -708,6 +768,7 @@
     closeForceLogout();
   }
 
+  // ── REPORT — grouped by shift date (log-in date) ──────────────────
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
@@ -717,7 +778,7 @@
     emptyState.style.display = 'none';
     const grouped = {};
     completedEntries.forEach(entry => {
-      const sd = getShiftDate(entry.logIn);
+      const sd = getShiftDate(entry.logIn); // always use log-in date
       const mk = sd.toLocaleString('default', { month: 'long', year: 'numeric' });
       const dk = sd.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
       if (!grouped[mk]) grouped[mk] = {};
@@ -905,7 +966,13 @@
     if (!filtered.length) { showToast('No entries to export', 'info'); return; }
     const data = filtered.map(e => {
       const elapsed = e.logOut ? getElapsedTime(e.logIn, e.logOut) : getElapsedTime(e.logIn);
-      return { 'Shift Date': getShiftDate(e.logIn).toLocaleDateString(), 'Agent ID': e.agent, 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc, 'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '', 'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active', 'Log-In Remarks': e.remarks || '', 'Log-Out Remarks': e.logOutRemarks || '' };
+      return {
+        'Shift Date': getShiftDate(e.logIn).toLocaleDateString(), // always log-in date
+        'Agent ID': e.agent, 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc,
+        'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '',
+        'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active',
+        'Log-In Remarks': e.remarks || '', 'Log-Out Remarks': e.logOutRemarks || ''
+      };
     });
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
