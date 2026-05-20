@@ -14,6 +14,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'DM Sans', sans-serif; background: #f4f6f9; min-height: 100vh; color: #1f2937; }
     .mono { font-family: 'DM Mono', monospace; }
+
     #loginPage { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%); padding: 1rem; }
     .login-card { background: white; border-radius: 24px; padding: 2.5rem 2rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
     .track-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; }
@@ -32,10 +33,12 @@
     .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .login-error { color: #ef4444; font-size: 0.85rem; text-align: center; margin-top: 0.75rem; display: none; }
     .login-footer { text-align: center; color: #9ca3af; font-size: 0.8rem; margin-top: 1.5rem; }
+
     #setPasswordPage { display: none; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a6fc4 0%, #0ea5a0 100%); padding: 1rem; }
     #setPasswordPage.show { display: flex; }
     #appPage { display: none; }
     #appPage.show { display: block; }
+
     .header { background: white; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-logo { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: opacity 0.2s; }
@@ -57,6 +60,7 @@
     .live-dot { width: 8px; height: 8px; background: #16a34a; border-radius: 50%; animation: pulse 2s infinite; }
     .live-dot.disconnected { background: #ef4444; animation: none; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+
     .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -85,6 +89,7 @@
     .info-note { display: none; padding: 0.75rem 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af; font-size: 0.9rem; margin-top: 1rem; }
     .info-note.visible { display: block; }
     .info-note.warning { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
@@ -99,6 +104,7 @@
     .elapsed-green { color: #16a34a; }
     .elapsed-amber { color: #d97706; }
     .elapsed-red { color: #ef4444; }
+
     .month-group { margin-bottom: 1rem; }
     .group-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f9fafb; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
     .group-header:hover { background: #f3f4f6; }
@@ -113,6 +119,7 @@
     .day-header.expanded svg { transform: rotate(90deg); }
     .day-content { display: none; margin-top: 0.5rem; }
     .day-content.expanded { display: block; }
+
     .export-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
     .settings-admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
     .settings-admin-card { background: #f9fafb; border-radius: 12px; padding: 1.25rem; border: 1px solid #e5e7eb; }
@@ -128,17 +135,21 @@
     .pw-item-pw { font-family: 'DM Mono', monospace; color: #6b7280; font-size: 0.85rem; min-width: 80px; }
     .pw-item-input { flex: 1; padding: 0.4rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.85rem; min-width: 140px; }
     .pw-item-input:focus { outline: none; border-color: #1a6fc4; }
+
+    /* Shift settings styles */
     .shift-settings-card { background: #f9fafb; border-radius: 12px; padding: 1.5rem; border: 1px solid #e5e7eb; }
     .shift-time-row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1.25rem; }
     .shift-time-row .form-group { min-width: 160px; flex: 1; }
     .shift-info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.88rem; color: #1e40af; margin-top: 1rem; line-height: 1.6; }
     .shift-info-box strong { font-weight: 700; }
+
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
     .modal { background: white; border-radius: 16px; padding: 2rem; width: 100%; max-width: 420px; }
     .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
     .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
     .modal-actions .btn { flex: 1; }
+
     .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
     .settings-overlay.active { display: flex; }
     .settings-modal { background: white; border-radius: 20px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
@@ -158,6 +169,7 @@
     .settings-back { display: flex; align-items: center; gap: 0.5rem; background: none; border: none; font-family: inherit; font-size: 0.9rem; color: #1a6fc4; cursor: pointer; margin-bottom: 1rem; padding: 0; }
     .settings-back:hover { text-decoration: underline; }
     .section-title { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+
     .toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; }
     .toast { padding: 1rem 1.5rem; border-radius: 10px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
     .toast.success { background: #166534; }
@@ -166,6 +178,7 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     .empty-state { text-align: center; padding: 3rem; color: #9ca3af; }
     .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5; }
+
     @media (max-width: 768px) {
       .header { padding: 1rem; }
       .header-content { flex-direction: column; gap: 1rem; }
@@ -180,6 +193,7 @@
 </head>
 <body>
 
+<!-- LOGIN PAGE -->
 <div id="loginPage">
   <div class="login-card">
     <div class="track-logo">
@@ -201,8 +215,14 @@
     </div>
     <p class="login-subtitle">Attendance Log System</p>
     <div class="login-form">
-      <div class="form-group"><label>Agent ID</label><input type="text" class="login-input" id="loginId" placeholder="e.g. Dale.RN" autocomplete="off"></div>
-      <div class="form-group"><label>Password</label><input type="password" class="login-input" id="loginPassword" placeholder="Enter password" maxlength="20"></div>
+      <div class="form-group">
+        <label>Agent ID</label>
+        <input type="text" class="login-input" id="loginId" placeholder="e.g. Dale.RN" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="login-input" id="loginPassword" placeholder="Enter password" maxlength="20">
+      </div>
       <p class="login-error" id="loginError"></p>
       <button class="login-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
     </div>
@@ -210,6 +230,7 @@
   </div>
 </div>
 
+<!-- SET PASSWORD PAGE -->
 <div id="setPasswordPage">
   <div class="login-card">
     <div class="track-logo">
@@ -232,14 +253,21 @@
     <p class="login-subtitle">Create Your Password</p>
     <p style="text-align:center;color:#6b7280;font-size:0.9rem;margin-bottom:1.5rem;">Welcome! First time logging in.<br>Please create your password.</p>
     <div class="login-form">
-      <div class="form-group"><label>New Password <span style="color:#ef4444">*</span></label><input type="password" class="login-input" id="newPassword" placeholder="4–20 characters" maxlength="20"></div>
-      <div class="form-group"><label>Confirm Password <span style="color:#ef4444">*</span></label><input type="password" class="login-input" id="confirmPassword" placeholder="Repeat password" maxlength="20"></div>
+      <div class="form-group">
+        <label>New Password <span style="color:#ef4444">*</span></label>
+        <input type="password" class="login-input" id="newPassword" placeholder="4–20 characters" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password <span style="color:#ef4444">*</span></label>
+        <input type="password" class="login-input" id="confirmPassword" placeholder="Repeat password" maxlength="20">
+      </div>
       <p class="login-error" id="setPasswordError"></p>
       <button class="login-btn" onclick="handleSetPassword()">Create Password & Sign In</button>
     </div>
   </div>
 </div>
 
+<!-- MAIN APP -->
 <div id="appPage">
   <header class="header">
     <div class="header-content">
@@ -265,22 +293,46 @@
           <button class="nav-btn active" data-tab="entry">New Entry</button>
           <button class="nav-btn" data-tab="report">Report</button>
         </nav>
-        <div class="live-indicator"><span class="live-dot" id="liveDot"></span><span id="liveText">Live</span></div>
+        <div class="live-indicator">
+          <span class="live-dot" id="liveDot"></span>
+          <span id="liveText">Live</span>
+        </div>
         <div class="user-chip" id="userChip">Admin</div>
         <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
       </div>
     </div>
   </header>
+
   <main class="main">
     <div class="tab-content active" id="tab-entry">
       <div class="card">
         <h2 class="card-title">Log Attendance</h2>
         <form class="entry-form" id="entryForm">
-          <div class="form-group"><label class="form-label">Agent ID <span class="required">*</span></label><input type="text" class="form-input" id="agentName" list="agentsList" required autocomplete="off"><datalist id="agentsList"></datalist></div>
-          <div class="form-group"><label class="form-label">Team Lead <span class="required">*</span></label><select class="form-select" id="teamLead" required><option value="">Select Lead</option></select></div>
-          <div class="form-group"><label class="form-label">Work Status <span class="required">*</span></label><select class="form-select" id="workStatus" required><option value="">Select Status</option><option value="WIO">WIO</option><option value="WFH">WFH</option></select></div>
-          <div class="form-group"><label class="form-label">Location <span class="required">*</span></label><select class="form-select" id="location" required><option value="">Select Location</option><option value="Cebu">Cebu</option><option value="Manila">Manila</option></select></div>
-          <div class="form-group remarks"><label class="form-label">Remarks</label><input type="text" class="form-input" id="remarks"></div>
+          <div class="form-group">
+            <label class="form-label">Agent ID <span class="required">*</span></label>
+            <input type="text" class="form-input" id="agentName" list="agentsList" required autocomplete="off">
+            <datalist id="agentsList"></datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Team Lead <span class="required">*</span></label>
+            <select class="form-select" id="teamLead" required><option value="">Select Lead</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Work Status <span class="required">*</span></label>
+            <select class="form-select" id="workStatus" required>
+              <option value="">Select Status</option><option value="WIO">WIO</option><option value="WFH">WFH</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location <span class="required">*</span></label>
+            <select class="form-select" id="location" required>
+              <option value="">Select Location</option><option value="Cebu">Cebu</option><option value="Manila">Manila</option>
+            </select>
+          </div>
+          <div class="form-group remarks">
+            <label class="form-label">Remarks</label>
+            <input type="text" class="form-input" id="remarks">
+          </div>
           <button type="submit" class="btn btn-primary" id="submitBtn"><span>⏱</span> Log In</button>
         </form>
         <div class="info-note" id="infoNote"></div>
@@ -289,7 +341,9 @@
         <h2 class="card-title">Today's Active Entries</h2>
         <div class="table-container">
           <table>
-            <thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th></tr></thead>
+            <thead>
+              <tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th><th id="actionHeader">Action</th></tr>
+            </thead>
             <tbody id="activeTableBody"></tbody>
           </table>
         </div>
@@ -299,6 +353,7 @@
         </div>
       </div>
     </div>
+
     <div class="tab-content" id="tab-report">
       <div class="card">
         <h2 class="card-title">Completed Entries</h2>
@@ -312,9 +367,14 @@
         <div class="card">
           <h2 class="card-title">🗑 Delete Entries</h2>
           <div class="export-form">
+            <div class="form-group"><label class="form-label">Agent <span style="color:#9ca3af;font-size:0.8rem;">(optional)</span></label>
+              <select class="form-select" id="deleteAgent"><option value="">All Agents</option></select>
+            </div>
             <div class="form-group"><label class="form-label">From Date</label><input type="date" class="form-input" id="deleteFrom"></div>
             <div class="form-group"><label class="form-label">To Date</label><input type="date" class="form-input" id="deleteTo"></div>
-            <div class="form-group"><label class="form-label">Include</label><select class="form-select" id="deleteInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select></div>
+            <div class="form-group"><label class="form-label">Include</label>
+              <select class="form-select" id="deleteInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select>
+            </div>
             <button class="btn btn-danger" onclick="confirmDeleteEntries()"><span>🗑</span> Delete</button>
           </div>
         </div>
@@ -323,7 +383,9 @@
           <div class="export-form">
             <div class="form-group"><label class="form-label">From Date</label><input type="date" class="form-input" id="exportFrom"></div>
             <div class="form-group"><label class="form-label">To Date</label><input type="date" class="form-input" id="exportTo"></div>
-            <div class="form-group"><label class="form-label">Include</label><select class="form-select" id="exportInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select></div>
+            <div class="form-group"><label class="form-label">Include</label>
+              <select class="form-select" id="exportInclude"><option value="all">All</option><option value="completed">Completed</option><option value="active">Active</option></select>
+            </div>
             <button class="btn btn-success" onclick="exportToExcel()"><span>📥</span> Download</button>
           </div>
         </div>
@@ -332,32 +394,54 @@
   </main>
 </div>
 
+<!-- SETTINGS MODAL -->
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-modal">
-    <div class="settings-header"><div class="settings-title">⚙️ Settings</div><button class="settings-close" onclick="closeSettings()">×</button></div>
+    <div class="settings-header">
+      <div class="settings-title">⚙️ Settings</div>
+      <button class="settings-close" onclick="closeSettings()">×</button>
+    </div>
     <div class="settings-body">
       <div id="settingsLock">
         <div class="settings-lock">
           <div class="settings-lock-icon">🔒</div>
           <h3 style="margin-bottom:1rem;font-weight:700;">Settings Access</h3>
           <div style="width:100%;max-width:300px;">
-            <div class="form-group" style="margin-bottom:1rem;"><input type="password" class="form-input" id="settingsPasswordInput" placeholder="Enter password"></div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <input type="password" class="form-input" id="settingsPasswordInput" placeholder="Enter password">
+            </div>
             <button class="btn btn-primary" style="width:100%;" onclick="unlockSettings()">Unlock</button>
           </div>
         </div>
       </div>
       <div id="settingsMenu" style="display:none;">
         <div class="settings-menu">
-          <button class="settings-menu-btn" onclick="showSettingsView('admin')"><div class="icon">⚙️</div><div class="label">Admin Panel</div><div class="sublabel">Manage agents & leads</div></button>
-          <button class="settings-menu-btn" onclick="showSettingsView('passwords')"><div class="icon">🔑</div><div class="label">Passwords</div><div class="sublabel">Manage all passwords</div></button>
-          <button class="settings-menu-btn" onclick="showSettingsView('shift')"><div class="icon">🕐</div><div class="label">Shift Window</div><div class="sublabel">Set shift start & end times</div></button>
+          <button class="settings-menu-btn" onclick="showSettingsView('admin')">
+            <div class="icon">⚙️</div><div class="label">Admin Panel</div><div class="sublabel">Manage agents & leads</div>
+          </button>
+          <button class="settings-menu-btn" onclick="showSettingsView('passwords')">
+            <div class="icon">🔑</div><div class="label">Passwords</div><div class="sublabel">Manage all passwords</div>
+          </button>
+          <button class="settings-menu-btn" onclick="showSettingsView('shift')">
+            <div class="icon">🕐</div><div class="label">Shift Window</div><div class="sublabel">Set shift start & end times</div>
+          </button>
         </div>
       </div>
       <div id="settingsAdminView" style="display:none;">
         <button class="settings-back" onclick="showSettingsView('menu')">← Back</button>
         <div class="settings-admin-grid">
-          <div class="settings-admin-card"><div class="section-title">Manage Agents</div><textarea id="agentsBulk" placeholder="Enter agent IDs (one per line)"></textarea><button class="btn btn-primary btn-sm" onclick="addAgents()">Add Agents</button><div class="tags-list" id="agentsTags"></div></div>
-          <div class="settings-admin-card"><div class="section-title">Manage Team Leads</div><textarea id="leadsBulk" placeholder="Enter team lead names (one per line)"></textarea><button class="btn btn-primary btn-sm" onclick="addLeads()">Add Team Leads</button><div class="tags-list" id="leadsTags"></div></div>
+          <div class="settings-admin-card">
+            <div class="section-title">Manage Agents</div>
+            <textarea id="agentsBulk" placeholder="Enter agent IDs (one per line)"></textarea>
+            <button class="btn btn-primary btn-sm" onclick="addAgents()">Add Agents</button>
+            <div class="tags-list" id="agentsTags"></div>
+          </div>
+          <div class="settings-admin-card">
+            <div class="section-title">Manage Team Leads</div>
+            <textarea id="leadsBulk" placeholder="Enter team lead names (one per line)"></textarea>
+            <button class="btn btn-primary btn-sm" onclick="addLeads()">Add Team Leads</button>
+            <div class="tags-list" id="leadsTags"></div>
+          </div>
         </div>
       </div>
       <div id="settingsPasswordsView" style="display:none;">
@@ -371,14 +455,24 @@
         <div class="section-title">Agent Passwords</div>
         <div class="pw-list" id="agentPasswordsList"></div>
       </div>
+
+      <!-- SHIFT WINDOW VIEW -->
       <div id="settingsShiftView" style="display:none;">
         <button class="settings-back" onclick="showSettingsView('menu')">← Back</button>
         <div class="section-title">Shift Window</div>
         <div class="shift-settings-card">
-          <p style="font-size:0.9rem;color:#4b5563;margin-bottom:1.25rem;">Define when a shift starts and ends. Logins made after midnight but before the shift end time will be counted as part of the <em>previous</em> day's shift.</p>
+          <p style="font-size:0.9rem;color:#4b5563;margin-bottom:1.25rem;">
+            Define when a shift starts and ends. Logins made after midnight but before the shift end time will be counted as part of the <em>previous</em> day's shift.
+          </p>
           <div class="shift-time-row">
-            <div class="form-group"><label class="form-label">Shift Start</label><input type="time" class="form-input" id="shiftStartInput"></div>
-            <div class="form-group"><label class="form-label">Shift End <span style="font-size:0.78rem;color:#6b7280;">(next day if past midnight)</span></label><input type="time" class="form-input" id="shiftEndInput"></div>
+            <div class="form-group">
+              <label class="form-label">Shift Start</label>
+              <input type="time" class="form-input" id="shiftStartInput">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Shift End <span style="font-size:0.78rem;color:#6b7280;">(next day if past midnight)</span></label>
+              <input type="time" class="form-input" id="shiftEndInput">
+            </div>
           </div>
           <button class="btn btn-primary" onclick="saveShiftSettings()">💾 Save Shift Window</button>
           <div class="shift-info-box" id="shiftInfoBox"></div>
@@ -388,28 +482,49 @@
   </div>
 </div>
 
+<!-- Force Logout Modal -->
 <div class="modal-overlay" id="forceLogoutModal">
   <div class="modal">
     <h3 class="modal-title">🚪 Force Log Out — <span id="forceLogoutName"></span></h3>
-    <div class="form-group" style="margin-bottom:1rem;"><label class="form-label">Admin Password <span class="required">*</span></label><input type="password" class="form-input" id="forceLogoutPw" placeholder="Enter admin password"></div>
-    <div class="form-group"><label class="form-label">Remarks (optional)</label><input type="text" class="form-input" id="forceLogoutRemarks" placeholder="Reason for force logout"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeForceLogout()">Cancel</button><button class="btn btn-danger" onclick="submitForceLogout()">Force Log Out</button></div>
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label class="form-label">Admin Password <span class="required">*</span></label>
+      <input type="password" class="form-input" id="forceLogoutPw" placeholder="Enter admin password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Remarks (optional)</label>
+      <input type="text" class="form-input" id="forceLogoutRemarks" placeholder="Reason for force logout">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeForceLogout()">Cancel</button>
+      <button class="btn btn-danger" onclick="submitForceLogout()">Force Log Out</button>
+    </div>
   </div>
 </div>
 
+<!-- Self Logout Modal -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal">
     <h3 class="modal-title">🚪 Log Out — <span id="logoutAgentName"></span></h3>
-    <div class="form-group"><label class="form-label">Remarks (optional)</label><input type="text" class="form-input" id="logoutRemarks" placeholder="Optional remarks"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('logoutModal').classList.remove('active')">Cancel</button><button class="btn btn-danger" onclick="submitSelfLogout()">Log Out</button></div>
+    <div class="form-group">
+      <label class="form-label">Remarks (optional)</label>
+      <input type="text" class="form-input" id="logoutRemarks" placeholder="Optional remarks">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('logoutModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-danger" onclick="submitSelfLogout()">Log Out</button>
+    </div>
   </div>
 </div>
 
+<!-- Confirm Delete Modal -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
     <h3 class="modal-title">⚠️ Confirm Delete</h3>
     <p id="confirmMessage" style="color:#4b5563;font-size:0.95rem;line-height:1.6;"></p>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('confirmModal').classList.remove('active')">Cancel</button><button class="btn btn-danger" onclick="deleteEntries()">Delete</button></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('confirmModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-danger" onclick="deleteEntries()">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -431,42 +546,65 @@
   let settingsUnlocked = false;
   let ADMIN_PASSWORD = 'Pineapple';
   const SETTINGS_PASSWORD = 'Glendale';
+
+  // ── SHIFT WINDOW — default 2:00 PM (14) start, 2:00 AM (2) end ──
   let shiftSettings = { startHour: 14, startMinute: 0, endHour: 2, endMinute: 0 };
 
-  // ── SHIFT DATE HELPERS ────────────────────────────────────────────
+  // ── SHIFT DATE HELPERS ──────────────────────────────────────────
+  // Returns the "shift date" for a given timestamp as a Date object
+  // (normalized to midnight of the shift day).
+  // If the timestamp's local time is before shiftEnd, it belongs to
+  // the previous calendar day's shift.
   function getShiftDate(ts) {
     const d = new Date(ts);
     const totalMinutes = d.getHours() * 60 + d.getMinutes();
     const endTotalMinutes = shiftSettings.endHour * 60 + shiftSettings.endMinute;
+    const startTotalMinutes = shiftSettings.startHour * 60 + shiftSettings.startMinute;
+
+    // If the shift end is past midnight (endHour < startHour),
+    // any time from 00:00 up to (but not including) endTime belongs
+    // to the previous day's shift.
     const crossesMidnight = shiftSettings.endHour < shiftSettings.startHour ||
       (shiftSettings.endHour === shiftSettings.startHour && shiftSettings.endMinute < shiftSettings.startMinute);
+
     if (crossesMidnight && totalMinutes < endTotalMinutes) {
-      const prev = new Date(d); prev.setDate(prev.getDate() - 1); prev.setHours(0,0,0,0); return prev;
+      const prev = new Date(d);
+      prev.setDate(prev.getDate() - 1);
+      prev.setHours(0, 0, 0, 0);
+      return prev;
     }
-    const result = new Date(d); result.setHours(0,0,0,0); return result;
+    const result = new Date(d);
+    result.setHours(0, 0, 0, 0);
+    return result;
   }
 
-  function getShiftDateString(ts) { return getShiftDate(ts).toDateString(); }
-  function getCurrentShiftDateString() { return getShiftDateString(Date.now()); }
+  function getShiftDateString(ts) {
+    return getShiftDate(ts).toDateString();
+  }
 
-  // Check if agent already has a completed entry in the current shift window
-  function hasCompletedEntryThisShift(agentName) {
-    const currentShift = getCurrentShiftDateString();
-    return Object.values(entries).some(e =>
-      e.agent && e.agent.toLowerCase() === agentName.toLowerCase() &&
-      e.logOut &&
-      getShiftDateString(e.logIn) === currentShift
-    );
+  function getCurrentShiftDateString() {
+    return getShiftDateString(Date.now());
   }
 
   function formatShiftInfo() {
-    const fmt = (h, m) => { const ap = h >= 12 ? 'PM' : 'AM'; const hh = h % 12 || 12; return hh + ':' + String(m).padStart(2,'0') + ' ' + ap; };
-    const { startHour: sh, startMinute: sm, endHour: eh, endMinute: em } = shiftSettings;
-    const cross = eh < sh || (eh === sh && em <= sm);
-    return 'Active shift: <strong>' + fmt(sh,sm) + '</strong> &rarr; <strong>' + fmt(eh,em) + (cross ? ' (next day)' : '') + '</strong>. '
-      + (cross ? 'Logins between midnight and <strong>' + fmt(eh,em) + '</strong> count as the <strong>previous day\'s</strong> shift.' : 'All logins within the same calendar day are counted together.');
+    const startH = shiftSettings.startHour;
+    const startM = shiftSettings.startMinute;
+    const endH = shiftSettings.endHour;
+    const endM = shiftSettings.endMinute;
+    const fmt = (h, m) => {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hh = h % 12 || 12;
+      return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+    };
+    const crossesMidnight = endH < startH || (endH === startH && endM <= startM);
+    const dayNote = crossesMidnight ? ' (next day)' : '';
+    return `Active shift: <strong>${fmt(startH,startM)}</strong> → <strong>${fmt(endH,endM)}${dayNote}</strong>. `
+      + (crossesMidnight
+        ? `Logins between midnight and <strong>${fmt(endH,endM)}</strong> are counted as the <strong>previous day's</strong> shift.`
+        : `All logins within the same calendar day are counted together.`);
   }
 
+  // ── PRELOAD agents from localStorage instantly, then refresh from Firebase ──
   (function initData() {
     const a = localStorage.getItem('attendance_agents');
     const l = localStorage.getItem('attendance_leads');
@@ -474,6 +612,7 @@
     if (a) agents = JSON.parse(a);
     if (l) leads = JSON.parse(l);
     if (s) shiftSettings = JSON.parse(s);
+    // Refresh from Firebase in background
     dbRef.once('value').then(snap => {
       const data = snap.val();
       if (data) {
@@ -485,6 +624,7 @@
     });
   })();
 
+  // ── RESTORE SESSION on refresh ──
   (function restoreSession() {
     const saved = sessionStorage.getItem('currentUser');
     if (saved) { currentUser = JSON.parse(saved); showApp(); }
@@ -500,25 +640,37 @@
     initApp();
   }
 
+  // LOGIN
   function handleLogin() {
     const loginId = document.getElementById('loginId').value.trim();
     const password = document.getElementById('loginPassword').value;
     document.getElementById('loginError').style.display = 'none';
     if (!loginId) { showLoginError('Please enter your Agent ID.'); return; }
+
     if (loginId.toLowerCase() === 'admin') {
       if (password === ADMIN_PASSWORD) { currentUser = { id: 'Admin', isAdmin: true }; sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); showApp(); }
       else showLoginError('Invalid Agent ID or password.');
       return;
     }
+
     const isRegistered = agents.some(a => a.toLowerCase() === loginId.toLowerCase());
     if (!isRegistered) { showLoginError('Agent ID is not registered. Please contact your admin.'); return; }
+
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in...';
+
     dbRef.child('user_passwords').child(sanitizeKey(loginId)).once('value').then(snap => {
-      const stored = snap.val(); btn.disabled = false; btn.textContent = 'Sign In';
-      if (stored === null) { pendingLoginId = loginId; document.getElementById('loginPage').style.display = 'none'; document.getElementById('setPasswordPage').classList.add('show'); }
-      else if (stored === password) { currentUser = { id: loginId, isAdmin: false }; sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); showApp(); }
-      else showLoginError('Invalid Agent ID or password.');
+      const stored = snap.val();
+      btn.disabled = false; btn.textContent = 'Sign In';
+      if (stored === null) {
+        pendingLoginId = loginId;
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('setPasswordPage').classList.add('show');
+      } else if (stored === password) {
+        currentUser = { id: loginId, isAdmin: false };
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        showApp();
+      } else showLoginError('Invalid Agent ID or password.');
     }).catch(() => { btn.disabled = false; btn.textContent = 'Sign In'; showLoginError('Connection error. Please try again.'); });
   }
 
@@ -528,28 +680,39 @@
   function handleSetPassword() {
     const newPw = document.getElementById('newPassword').value;
     const confirmPw = document.getElementById('confirmPassword').value;
-    const errEl = document.getElementById('setPasswordError'); errEl.style.display = 'none';
+    const errEl = document.getElementById('setPasswordError');
+    errEl.style.display = 'none';
     if (newPw.length < 4 || newPw.length > 20) { errEl.textContent = 'Password must be 4–20 characters.'; errEl.style.display = 'block'; return; }
     if (newPw !== confirmPw) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
     dbRef.child('user_passwords').child(sanitizeKey(pendingLoginId)).set(newPw).then(() => {
-      currentUser = { id: pendingLoginId, isAdmin: false }; sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); showApp();
+      currentUser = { id: pendingLoginId, isAdmin: false };
+      sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showApp();
     }).catch(() => { errEl.textContent = 'Error saving. Try again.'; errEl.style.display = 'block'; });
   }
 
   function sanitizeKey(str) { return str.replace(/[.#$[\]]/g, '_'); }
 
   function handleSignOut() {
-    currentUser = null; sessionStorage.removeItem('currentUser'); settingsUnlocked = false;
+    currentUser = null;
+    sessionStorage.removeItem('currentUser');
+    settingsUnlocked = false;
     document.getElementById('appPage').classList.remove('show');
     document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('loginId').value = ''; document.getElementById('loginPassword').value = '';
+    document.getElementById('loginId').value = '';
+    document.getElementById('loginPassword').value = '';
     document.getElementById('loginError').style.display = 'none';
     document.getElementById('reportAdminTools').style.display = 'none';
     document.getElementById('actionHeader').style.display = '';
   }
 
+  // INIT APP
   function initApp() {
-    initFirebaseConnection(); initNavigation(); initEntryForm(); loadFromLocalStorage();
+    initFirebaseConnection();
+    initNavigation();
+    initEntryForm();
+    loadFromLocalStorage();
+
     dbRef.on('value', snap => {
       const data = snap.val();
       if (data) {
@@ -562,11 +725,11 @@
         renderActiveTable();
         const activeTab = document.querySelector('.nav-btn.active')?.dataset?.tab;
         if (activeTab === 'report') renderReport();
-        // Re-run agent input check in case entries updated
-        if (currentUser && !currentUser.isAdmin) handleAgentInput();
       }
     });
+
     setInterval(() => renderActiveTable(), 5000);
+
     const today = new Date().toISOString().split('T')[0];
     ['exportFrom','exportTo','deleteFrom','deleteTo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = today; });
   }
@@ -585,7 +748,8 @@
         const tab = btn.dataset.tab;
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active'); document.getElementById('tab-' + tab).classList.add('active');
+        btn.classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
         if (tab === 'report') renderReport();
       });
     });
@@ -603,6 +767,16 @@
     if (currentUser && !currentUser.isAdmin) setTimeout(handleAgentInput, 500);
   }
 
+  // Returns true if agent already has a completed entry in the current shift window
+  function hasCompletedEntryThisShift(agentName) {
+    const currentShift = getCurrentShiftDateString();
+    return Object.values(entries).some(e =>
+      e.agent && e.agent.toLowerCase() === agentName.toLowerCase() &&
+      e.logOut &&
+      getShiftDateString(e.logIn) === currentShift
+    );
+  }
+
   function handleAgentInput() {
     const agentName = document.getElementById('agentName').value.trim();
     const teamLead = document.getElementById('teamLead');
@@ -612,20 +786,18 @@
     const infoNote = document.getElementById('infoNote');
 
     if (!agentName) {
-      // Reset to clean state
       teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
-      infoNote.classList.remove('visible', 'warning');
+      infoNote.className = 'info-note'; infoNote.classList.remove('visible', 'warning');
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<span>⏱</span> Log In';
       submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
       return;
     }
 
-    // Priority 1: Already has active entry → show Log Out button
+    // Priority 1: Agent is currently clocked in → show Log Out
     const activeEntry = Object.values(entries).find(e =>
       e.agent && e.agent.toLowerCase() === agentName.toLowerCase() && !e.logOut
     );
-
     if (activeEntry) {
       teamLead.value = activeEntry.lead; workStatus.value = activeEntry.ws; location.value = activeEntry.loc;
       teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
@@ -637,8 +809,8 @@
       return;
     }
 
-    // Priority 2: Already completed a shift today → block double entry
-    if (hasCompletedEntryThisShift(agentName)) {
+    // Priority 2: Already completed a shift today — block for agents, bypass for admin
+    if (!currentUser.isAdmin && hasCompletedEntryThisShift(agentName)) {
       teamLead.disabled = true; workStatus.disabled = true; location.disabled = true;
       infoNote.className = 'info-note visible warning';
       infoNote.innerHTML = '⛔ <strong>' + agentName + '</strong> has already completed a shift today. Double entry is not allowed.';
@@ -648,9 +820,9 @@
       return;
     }
 
-    // Priority 3: Clean state — ready to log in
+    // Priority 3: Ready to log in
     teamLead.disabled = false; workStatus.disabled = false; location.disabled = false;
-    infoNote.classList.remove('visible', 'warning');
+    infoNote.className = 'info-note'; infoNote.classList.remove('visible', 'warning');
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<span>⏱</span> Log In';
     submitBtn.classList.remove('btn-danger'); submitBtn.classList.add('btn-primary');
@@ -664,8 +836,8 @@
     const remarks = document.getElementById('remarks').value.trim();
     if (!agentName || !teamLead || !workStatus || !location) { showToast('Please fill in all required fields', 'error'); return; }
 
-    // Safety guard: block double entry even if UI check was bypassed
-    if (hasCompletedEntryThisShift(agentName)) {
+    // Block double entry for non-admin only
+    if (!currentUser.isAdmin && hasCompletedEntryThisShift(agentName)) {
       showToast(agentName + ' already completed a shift today. Double entry not allowed.', 'error');
       return;
     }
@@ -689,7 +861,7 @@
   function submitSelfLogout() {
     const remarks = document.getElementById('logoutRemarks').value.trim();
     const entry = entries[selfLogoutId];
-    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || null; saveEntry(entry); showToast('👋 ' + entry.agent + ' clocked out!', 'success'); }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || null; saveEntry(entry); showToast(`👋 ${entry.agent} clocked out!`, 'success'); }
     document.getElementById('logoutModal').classList.remove('active');
     selfLogoutId = null; resetForm();
   }
@@ -698,45 +870,63 @@
     document.getElementById('entryForm').reset();
     if (currentUser && !currentUser.isAdmin) { document.getElementById('agentName').value = currentUser.id; document.getElementById('agentName').disabled = true; }
     ['teamLead','workStatus','location'].forEach(id => document.getElementById(id).disabled = false);
-    document.getElementById('infoNote').classList.remove('visible', 'warning');
+    document.getElementById('infoNote').classList.remove('visible');
     const btn = document.getElementById('submitBtn');
-    btn.disabled = false;
     btn.innerHTML = '<span>⏱</span> Log In'; btn.classList.remove('btn-danger'); btn.classList.add('btn-primary');
-    // Re-check after reset (for non-admin agents)
-    if (currentUser && !currentUser.isAdmin) setTimeout(handleAgentInput, 100);
   }
 
-  // ── ACTIVE TABLE ──────────────────────────────────────────────────
+  // ── ACTIVE TABLE ─────────────────────────────────────────────────
+  // Shows ALL currently clocked-in agents (no logOut).
+  // Shift date logic is used for Report grouping only.
   function renderActiveTable() {
     const tbody = document.getElementById('activeTableBody');
     const emptyState = document.getElementById('activeEmpty');
+
     let activeEntries = Object.values(entries).filter(e => !e.logOut);
-    if (currentUser && !currentUser.isAdmin) activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    if (currentUser && !currentUser.isAdmin) {
+      activeEntries = activeEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    }
     activeEntries.sort((a, b) => b.logIn - a.logIn);
+
     if (!activeEntries.length) { tbody.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
+
     tbody.innerHTML = activeEntries.map(entry => {
       const elapsed = getElapsedTime(entry.logIn);
       const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
       const elapsedClass = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
       const isOverdue = totalHours > 22;
-      const wsBadge = entry.ws === 'WFH' ? '<span class="badge badge-success">WFH</span>' : '<span class="badge badge-primary">WIO</span>';
+
+      // Work Status badge — WFH or WIO only, never overdue
+      const wsBadge = entry.ws === 'WFH'
+        ? '<span class="badge badge-success">WFH</span>'
+        : '<span class="badge badge-primary">WIO</span>';
+
+      // Remarks — truncate to ~5 words, show full on hover
       const remarksText = entry.remarks || '';
       const words = remarksText.trim().split(/\s+/);
       const truncated = words.length > 5 ? words.slice(0, 5).join(' ') + '...' : remarksText;
-      const remarksCell = remarksText ? '<span title="' + remarksText.replace(/"/g, '&quot;') + '" style="cursor:default;">' + truncated + '</span>' : '&mdash;';
+      const remarksCell = remarksText
+        ? '<span title="' + remarksText.replace(/"/g, '&quot;') + '" style="cursor:default;">' + truncated + '</span>'
+        : '&mdash;';
+
       const actionBtn = currentUser.isAdmin
-        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Force Log Out</button><button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Delete</button></div>'
+        ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'
+          + '<button class="btn btn-danger btn-sm" onclick="openForceLogout(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Force Log Out</button>'
+          + '<button class="btn btn-outline btn-sm" onclick="deleteActiveEntry(\'' + entry.id + '\',\'' + entry.agent.replace(/'/g, "\\'") + '\')">Delete</button>'
+          + '</div>'
         : '';
+
       return '<tr class="' + (isOverdue ? 'overdue' : '') + '">'
         + '<td style="font-size:0.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.agent + '"><strong>' + entry.agent + '</strong></td>'
-        + '<td style="font-size:0.82rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.lead + '">' + entry.lead + '</td>'
+        + '<td style="font-size:0.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + entry.lead + '">' + entry.lead + '</td>'
         + '<td class="mono">' + formatTime(entry.logIn) + '</td>'
         + '<td class="mono ' + elapsedClass + '">' + formatElapsed(elapsed) + '</td>'
         + '<td>' + wsBadge + '</td>'
         + '<td>' + entry.loc + '</td>'
         + '<td style="font-size:0.85rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + remarksCell + '</td>'
-        + '<td>' + actionBtn + '</td></tr>';
+        + '<td>' + actionBtn + '</td>'
+        + '</tr>';
     }).join('');
   }
 
@@ -764,38 +954,44 @@
     const remarks = document.getElementById('forceLogoutRemarks').value.trim();
     if (pw !== ADMIN_PASSWORD) { showToast('Incorrect admin password', 'error'); return; }
     const entry = entries[forceLogoutId];
-    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || 'Force logout by admin'; saveEntry(entry); showToast('👋 ' + entry.agent + ' force logged out!', 'success'); }
+    if (entry) { entry.logOut = Date.now(); entry.logOutRemarks = remarks || 'Force logout by admin'; saveEntry(entry); showToast(`👋 ${entry.agent} force logged out!`, 'success'); }
     closeForceLogout();
   }
 
-  // ── REPORT — grouped by shift date (log-in date) ──────────────────
+  // ── REPORT ───────────────────────────────────────────────────────
+  // Groups completed entries by their shift date (not raw calendar date)
   function renderReport() {
     const content = document.getElementById('reportContent');
     const emptyState = document.getElementById('reportEmpty');
     let completedEntries = Object.values(entries).filter(e => e.logOut);
-    if (currentUser && !currentUser.isAdmin) completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    if (currentUser && !currentUser.isAdmin) {
+      completedEntries = completedEntries.filter(e => e.agent && e.agent.toLowerCase() === currentUser.id.toLowerCase());
+    }
     if (!completedEntries.length) { content.innerHTML = ''; emptyState.style.display = 'block'; return; }
     emptyState.style.display = 'none';
+
     const grouped = {};
     completedEntries.forEach(entry => {
-      const sd = getShiftDate(entry.logIn); // always use log-in date
-      const mk = sd.toLocaleString('default', { month: 'long', year: 'numeric' });
-      const dk = sd.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
-      if (!grouped[mk]) grouped[mk] = {};
-      if (!grouped[mk][dk]) grouped[mk][dk] = [];
-      grouped[mk][dk].push(entry);
+      // Group by shift date
+      const shiftDate = getShiftDate(entry.logIn);
+      const monthKey = shiftDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const dayKey = shiftDate.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
+      if (!grouped[monthKey]) grouped[monthKey] = {};
+      if (!grouped[monthKey][dayKey]) grouped[monthKey][dayKey] = [];
+      grouped[monthKey][dayKey].push(entry);
     });
+
     let html = '';
     Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(month => {
-      html += '<div class="month-group"><div class="group-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>' + month + ' (' + Object.values(grouped[month]).flat().length + ' entries)</div><div class="group-content">';
+      html += `<div class="month-group"><div class="group-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${month} (${Object.values(grouped[month]).flat().length} entries)</div><div class="group-content">`;
       Object.keys(grouped[month]).forEach(day => {
         const dayEntries = grouped[month][day].sort((a, b) => b.logIn - a.logIn);
-        html += '<div class="day-group"><div class="day-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>' + day + ' (' + dayEntries.length + ')</div><div class="day-content"><div class="table-container"><table><thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Log Out</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th></tr></thead><tbody>' + dayEntries.map(e => {
-          const el = getElapsedTime(e.logIn, e.logOut);
-          const th = el.hours + (el.days * 24) + (el.minutes / 60);
-          const ec = th > 22 ? 'elapsed-red' : th >= 8 ? 'elapsed-amber' : 'elapsed-green';
-          return '<tr><td><strong>' + e.agent + '</strong></td><td>' + e.lead + '</td><td class="mono">' + formatTime(e.logIn) + '</td><td class="mono">' + formatTime(e.logOut) + '</td><td class="mono ' + ec + '">' + formatElapsed(el) + '</td><td>' + e.ws + '</td><td>' + e.loc + '</td><td>' + (e.remarks || '—') + '</td></tr>';
-        }).join('') + '</tbody></table></div></div></div>';
+        html += `<div class="day-group"><div class="day-header" onclick="toggleGroup(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>${day} (${dayEntries.length})</div><div class="day-content"><div class="table-container"><table><thead><tr><th>Agent ID</th><th>Team Lead</th><th>Log In</th><th>Log Out</th><th>Elapsed</th><th>Work Status</th><th>Location</th><th>Remarks</th></tr></thead><tbody>${dayEntries.map(entry => {
+          const elapsed = getElapsedTime(entry.logIn, entry.logOut);
+          const totalHours = elapsed.hours + (elapsed.days * 24) + (elapsed.minutes / 60);
+          let ec = totalHours > 22 ? 'elapsed-red' : totalHours >= 8 ? 'elapsed-amber' : 'elapsed-green';
+          return `<tr><td><strong>${entry.agent}</strong></td><td>${entry.lead}</td><td class="mono">${formatTime(entry.logIn)}</td><td class="mono">${formatTime(entry.logOut)}</td><td class="mono ${ec}">${formatElapsed(elapsed)}</td><td>${entry.ws}</td><td>${entry.loc}</td><td>${entry.remarks || '—'}</td></tr>`;
+        }).join('')}</tbody></table></div></div></div>`;
       });
       html += '</div></div>';
     });
@@ -804,9 +1000,14 @@
 
   function toggleGroup(header) { header.classList.toggle('expanded'); header.nextElementSibling.classList.toggle('expanded'); }
 
+  // ── SETTINGS ─────────────────────────────────────────────────────
   function openSettings() {
     settingsUnlocked = false;
-    ['settingsLock','settingsMenu','settingsAdminView','settingsPasswordsView','settingsShiftView'].forEach((id, i) => document.getElementById(id).style.display = i === 0 ? 'block' : 'none');
+    document.getElementById('settingsLock').style.display = 'block';
+    document.getElementById('settingsMenu').style.display = 'none';
+    document.getElementById('settingsAdminView').style.display = 'none';
+    document.getElementById('settingsPasswordsView').style.display = 'none';
+    document.getElementById('settingsShiftView').style.display = 'none';
     document.getElementById('settingsPasswordInput').value = '';
     document.getElementById('settingsOverlay').classList.add('active');
     setTimeout(() => document.getElementById('settingsPasswordInput').focus(), 100);
@@ -817,30 +1018,41 @@
 
   function unlockSettings() {
     const pw = document.getElementById('settingsPasswordInput').value;
-    if (pw === SETTINGS_PASSWORD) { settingsUnlocked = true; document.getElementById('settingsLock').style.display = 'none'; document.getElementById('settingsMenu').style.display = 'block'; }
-    else { showToast('Incorrect password', 'error'); document.getElementById('settingsPasswordInput').value = ''; }
+    if (pw === SETTINGS_PASSWORD) {
+      settingsUnlocked = true;
+      document.getElementById('settingsLock').style.display = 'none';
+      document.getElementById('settingsMenu').style.display = 'block';
+    } else {
+      showToast('Incorrect password', 'error');
+      document.getElementById('settingsPasswordInput').value = '';
+    }
   }
 
   function showSettingsView(view) {
-    ['settingsMenu','settingsAdminView','settingsPasswordsView','settingsShiftView'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('settingsMenu').style.display = 'none';
+    document.getElementById('settingsAdminView').style.display = 'none';
+    document.getElementById('settingsPasswordsView').style.display = 'none';
+    document.getElementById('settingsShiftView').style.display = 'none';
     if (view === 'menu') { document.getElementById('settingsMenu').style.display = 'block'; return; }
     if (view === 'admin') { document.getElementById('settingsAdminView').style.display = 'block'; renderAgentsTags(); renderLeadsTags(); }
     if (view === 'passwords') { document.getElementById('settingsPasswordsView').style.display = 'block'; renderAgentPasswordsList(); }
     if (view === 'shift') {
       document.getElementById('settingsShiftView').style.display = 'block';
-      const pad = n => String(n).padStart(2,'0');
-      document.getElementById('shiftStartInput').value = pad(shiftSettings.startHour) + ':' + pad(shiftSettings.startMinute);
-      document.getElementById('shiftEndInput').value = pad(shiftSettings.endHour) + ':' + pad(shiftSettings.endMinute);
+      // Populate time inputs
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('shiftStartInput').value = `${pad(shiftSettings.startHour)}:${pad(shiftSettings.startMinute)}`;
+      document.getElementById('shiftEndInput').value = `${pad(shiftSettings.endHour)}:${pad(shiftSettings.endMinute)}`;
       document.getElementById('shiftInfoBox').innerHTML = formatShiftInfo();
     }
   }
 
+  // ── SHIFT SETTINGS SAVE ──────────────────────────────────────────
   function saveShiftSettings() {
-    const sv = document.getElementById('shiftStartInput').value;
-    const ev = document.getElementById('shiftEndInput').value;
-    if (!sv || !ev) { showToast('Please set both start and end times', 'error'); return; }
-    const [sh, sm] = sv.split(':').map(Number);
-    const [eh, em] = ev.split(':').map(Number);
+    const startVal = document.getElementById('shiftStartInput').value; // "HH:MM"
+    const endVal = document.getElementById('shiftEndInput').value;
+    if (!startVal || !endVal) { showToast('Please set both start and end times', 'error'); return; }
+    const [sh, sm] = startVal.split(':').map(Number);
+    const [eh, em] = endVal.split(':').map(Number);
     shiftSettings = { startHour: sh, startMinute: sm, endHour: eh, endMinute: em };
     dbRef.child('shift_settings').set(shiftSettings);
     localStorage.setItem('attendance_shift', JSON.stringify(shiftSettings));
@@ -849,13 +1061,14 @@
     renderActiveTable();
   }
 
+  // AGENTS & LEADS
   function addAgents() {
     const names = document.getElementById('agentsBulk').value.split('\n').map(n => n.trim()).filter(n => n);
     if (!names.length) return;
     agents = [...new Set([...agents, ...names])];
     saveAgentsAndLeads(); document.getElementById('agentsBulk').value = '';
     renderAgentsTags(); updateAgentsDatalist();
-    showToast('Added ' + names.length + ' agent(s)', 'success');
+    showToast(`Added ${names.length} agent(s)`, 'success');
   }
 
   function addLeads() {
@@ -864,49 +1077,70 @@
     leads = [...new Set([...leads, ...names])];
     saveAgentsAndLeads(); document.getElementById('leadsBulk').value = '';
     renderLeadsTags(); updateLeadsDropdown();
-    showToast('Added ' + names.length + ' lead(s)', 'success');
+    showToast(`Added ${names.length} lead(s)`, 'success');
   }
 
   function removeAgent(name) { agents = agents.filter(a => a !== name); saveAgentsAndLeads(); renderAgentsTags(); updateAgentsDatalist(); }
   function removeLead(name) { leads = leads.filter(l => l !== name); saveAgentsAndLeads(); renderLeadsTags(); updateLeadsDropdown(); }
 
   function renderAgentsTags() {
-    document.getElementById('agentsTags').innerHTML = agents.map(a => '<span class="tag">' + a + '<button class="tag-remove" onclick="removeAgent(\'' + a + '\')">&times;</button></span>').join('');
+    document.getElementById('agentsTags').innerHTML = agents.map(a => `<span class="tag">${a}<button class="tag-remove" onclick="removeAgent('${a}')">&times;</button></span>`).join('');
   }
 
   function renderLeadsTags() {
-    document.getElementById('leadsTags').innerHTML = leads.map(l => '<span class="tag">' + l + '<button class="tag-remove" onclick="removeLead(\'' + l + '\')">&times;</button></span>').join('');
+    document.getElementById('leadsTags').innerHTML = leads.map(l => `<span class="tag">${l}<button class="tag-remove" onclick="removeLead('${l}')">&times;</button></span>`).join('');
   }
 
   function updateAgentsDatalist() {
-    document.getElementById('agentsList').innerHTML = agents.map(a => '<option value="' + a + '">').join('');
+    document.getElementById('agentsList').innerHTML = agents.map(a => `<option value="${a}">`).join('');
+    const del = document.getElementById('deleteAgent');
+    if (del) {
+      const cur = del.value;
+      del.innerHTML = '<option value="">All Agents</option>' + agents.map(a => `<option value="${a}">${a}</option>`).join('');
+      if (agents.includes(cur)) del.value = cur;
+    }
   }
 
   function updateLeadsDropdown() {
     const select = document.getElementById('teamLead');
     const cur = select.value;
-    select.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => '<option value="' + l + '">' + l + '</option>').join('');
+    select.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => `<option value="${l}">${l}</option>`).join('');
     if (leads.includes(cur)) select.value = cur;
   }
 
+  // PASSWORDS
   function renderAgentPasswordsList() {
     const container = document.getElementById('agentPasswordsList');
     if (!agents.length) { container.innerHTML = '<p style="color:#9ca3af;font-size:0.9rem;">No agents added yet.</p>'; return; }
-    Promise.all(agents.map(id => dbRef.child('user_passwords').child(sanitizeKey(id)).once('value').then(s => ({ id, pw: s.val() })))).then(results => {
-      container.innerHTML = results.map(r => '<div class="pw-item"><div class="pw-item-id">' + r.id + '</div><div class="pw-item-pw">' + (r.pw === null ? '<em style="color:#f59e0b">(not set)</em>' : '••••••') + '</div><input type="password" class="pw-item-input" id="pw_' + sanitizeKey(r.id) + '" placeholder="New password" maxlength="20"><button class="btn btn-primary btn-sm" onclick="changeAgentPassword(\'' + r.id + '\')">Save</button><button class="btn btn-warning btn-sm" onclick="resetAgentPassword(\'' + r.id + '\')">Reset</button></div>').join('');
+    Promise.all(agents.map(agentId =>
+      dbRef.child('user_passwords').child(sanitizeKey(agentId)).once('value').then(snap => ({ id: agentId, pw: snap.val() }))
+    )).then(results => {
+      container.innerHTML = results.map(r => `
+        <div class="pw-item">
+          <div class="pw-item-id">${r.id}</div>
+          <div class="pw-item-pw">${r.pw === null ? '<em style="color:#f59e0b">(not set)</em>' : '••••••'}</div>
+          <input type="password" class="pw-item-input" id="pw_${sanitizeKey(r.id)}" placeholder="New password" maxlength="20">
+          <button class="btn btn-primary btn-sm" onclick="changeAgentPassword('${r.id}')">Save</button>
+          <button class="btn btn-warning btn-sm" onclick="resetAgentPassword('${r.id}')">Reset</button>
+        </div>
+      `).join('');
     });
   }
 
   function changeAgentPassword(agentId) {
-    const input = document.getElementById('pw_' + sanitizeKey(agentId));
+    const input = document.getElementById(`pw_${sanitizeKey(agentId)}`);
     const newPw = input.value.trim();
     if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
-    dbRef.child('user_passwords').child(sanitizeKey(agentId)).set(newPw).then(() => { showToast('Password updated for ' + agentId, 'success'); input.value = ''; renderAgentPasswordsList(); });
+    dbRef.child('user_passwords').child(sanitizeKey(agentId)).set(newPw).then(() => {
+      showToast(`Password updated for ${agentId}`, 'success'); input.value = ''; renderAgentPasswordsList();
+    });
   }
 
   function resetAgentPassword(agentId) {
-    if (!confirm('Reset password for ' + agentId + '? They will be prompted to create a new one on next login.')) return;
-    dbRef.child('user_passwords').child(sanitizeKey(agentId)).remove().then(() => { showToast('Password reset for ' + agentId, 'success'); renderAgentPasswordsList(); });
+    if (!confirm(`Reset password for ${agentId}? They will be prompted to create a new one on next login.`)) return;
+    dbRef.child('user_passwords').child(sanitizeKey(agentId)).remove().then(() => {
+      showToast(`Password reset for ${agentId}`, 'success'); renderAgentPasswordsList();
+    });
   }
 
   function changeAdminPassword() {
@@ -914,21 +1148,26 @@
     const confirm = document.getElementById('newAdminPwConfirm').value;
     if (newPw.length < 4 || newPw.length > 20) { showToast('Password must be 4–20 characters', 'error'); return; }
     if (newPw !== confirm) { showToast('Passwords do not match', 'error'); return; }
-    ADMIN_PASSWORD = newPw; dbRef.child('admin_password').set(newPw);
-    document.getElementById('newAdminPwInput').value = ''; document.getElementById('newAdminPwConfirm').value = '';
+    ADMIN_PASSWORD = newPw;
+    dbRef.child('admin_password').set(newPw);
+    document.getElementById('newAdminPwInput').value = '';
+    document.getElementById('newAdminPwConfirm').value = '';
     showToast('Admin password updated!', 'success');
   }
 
+  // ── DELETE & EXPORT ──────────────────────────────────────────────
   function getDeleteFilteredEntries() {
     const from = document.getElementById('deleteFrom').value;
     const to = document.getElementById('deleteTo').value;
     const include = document.getElementById('deleteInclude').value;
+    const agentFilter = document.getElementById('deleteAgent').value;
     if (!from || !to) return [];
     const fromTime = new Date(from).setHours(0,0,0,0);
     const toTime = new Date(to).setHours(23,59,59,999);
     return Object.values(entries).filter(e => {
       const t = new Date(e.logIn).getTime();
       if (t < fromTime || t > toTime) return false;
+      if (agentFilter && e.agent && e.agent.toLowerCase() !== agentFilter.toLowerCase()) return false;
       if (include === 'completed') return e.logOut !== null;
       if (include === 'active') return e.logOut === null;
       return true;
@@ -936,9 +1175,12 @@
   }
 
   function confirmDeleteEntries() {
-    const count = getDeleteFilteredEntries().length;
-    if (!count) { showToast('No entries to delete', 'info'); return; }
-    document.getElementById('confirmMessage').textContent = 'Delete ' + count + ' entries? This cannot be undone.';
+    const toDelete = getDeleteFilteredEntries();
+    const count = toDelete.length;
+    if (!count) { showToast('No entries found', 'info'); return; }
+    const agentFilter = document.getElementById('deleteAgent').value;
+    const agentNote = agentFilter ? ' for ' + agentFilter : '';
+    document.getElementById('confirmMessage').textContent = 'Delete ' + count + ' entr' + (count === 1 ? 'y' : 'ies') + agentNote + '? This cannot be undone.';
     document.getElementById('confirmModal').classList.add('active');
   }
 
@@ -966,8 +1208,9 @@
     if (!filtered.length) { showToast('No entries to export', 'info'); return; }
     const data = filtered.map(e => {
       const elapsed = e.logOut ? getElapsedTime(e.logIn, e.logOut) : getElapsedTime(e.logIn);
+      const shiftDate = getShiftDate(e.logIn);
       return {
-        'Shift Date': getShiftDate(e.logIn).toLocaleDateString(), // always log-in date
+        'Shift Date': shiftDate.toLocaleDateString(),
         'Agent ID': e.agent, 'Team Lead': e.lead, 'Work Status': e.ws, 'Location': e.loc,
         'Log In': formatDateTime(e.logIn), 'Log Out': e.logOut ? formatDateTime(e.logOut) : '',
         'Elapsed': formatElapsed(elapsed), 'Status': e.logOut ? 'Completed' : 'Active',
@@ -977,14 +1220,19 @@
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
-    XLSX.writeFile(wb, 'attendance_' + document.getElementById('exportFrom').value + '_to_' + document.getElementById('exportTo').value + '.xlsx');
+    XLSX.writeFile(wb, `attendance_${document.getElementById('exportFrom').value}_to_${document.getElementById('exportTo').value}.xlsx`);
     showToast('Excel downloaded!', 'success');
   }
 
-  function saveEntry(entry) { entries[entry.id] = entry; dbRef.child('entries').child(entry.id).set(entry); }
+  // DATA
+  function saveEntry(entry) {
+    entries[entry.id] = entry;
+    dbRef.child('entries').child(entry.id).set(entry);
+  }
 
   function saveAgentsAndLeads() {
-    dbRef.child('agents').set(agents); dbRef.child('leads').set(leads);
+    dbRef.child('agents').set(agents);
+    dbRef.child('leads').set(leads);
     localStorage.setItem('attendance_agents', JSON.stringify(agents));
     localStorage.setItem('attendance_leads', JSON.stringify(leads));
   }
@@ -994,16 +1242,17 @@
     if (e) { entries = JSON.parse(e); renderActiveTable(); updateAgentsDatalist(); updateLeadsDropdown(); }
   }
 
+  // UTILS
   function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
   function formatTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
   function formatDateTime(ts) { if (!ts) return '—'; return new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }); }
   function getElapsedTime(start, end = Date.now()) { const diff = end - start; return { days: Math.floor(diff/86400000), hours: Math.floor((diff%86400000)/3600000), minutes: Math.floor((diff%3600000)/60000) }; }
-  function formatElapsed(e) { return e.days > 0 ? e.days + 'd ' + e.hours + 'h ' + e.minutes + 'm' : e.hours + 'h ' + e.minutes + 'm'; }
+  function formatElapsed(e) { return e.days > 0 ? `${e.days}d ${e.hours}h ${e.minutes}m` : `${e.hours}h ${e.minutes}m`; }
 
   function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
-    toast.className = 'toast ' + type; toast.textContent = message;
+    toast.className = `toast ${type}`; toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, 3000);
   }
